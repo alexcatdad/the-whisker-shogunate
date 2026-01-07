@@ -17,7 +17,7 @@
     "validate": "node scripts/validate-tools.js"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.19.1",
+    "@modelcontextprotocol/sdk": "^1.25.2",
     "@whisker/data": "workspace:*",
     "@whisker/schemas": "workspace:*",
     "glob": "^10.3.10"
