@@ -1,0 +1,182 @@
+---
+import { getCollection } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import EntryCard from "../../components/EntryCard.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+
+export async function getStaticPaths() {
+  const allLore = await getCollection("lore");
+  const categories = [...new Set(allLore.map((entry) => entry.data.category))];
+
+  return categories.map((category) => ({
+    params: { category },
+    props: {
+      entries: allLore
+        .filter((entry) => entry.data.category === category)
+        .sort((a, b) => a.data.title.localeCompare(b.data.title)),
+    },
+  }));
+}
+
+interface Props {
+  entries: Awaited<ReturnType<typeof getCollection<"lore">>>;
+}
+
+const { category } = Astro.params;
+const { entries } = Astro.props;
+
+function getExcerpt(content: string, maxLength = 150): string {
+  const text = content.replace(/^#.*$/gm, "").trim();
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength).trim() + "...";
+}
+
+const categoryDescriptions: Record<string, string> = {
+  architecture: "Explore the buildings, structures, and architectural styles that define the physical landscape of Neko-kuni.",
+  characters: "Meet the notable figures and personalities who shape the world of the Whisker Shogunate.",
+  cuisine: "Discover the rich food culture, dining customs, and culinary traditions of cat society.",
+  culture: "Learn about the arts, customs, and cultural practices that make Neko-kuni unique.",
+  factions: "Understand the organizations, guilds, and political groups vying for influence.",
+  flora: "Explore the plants, gardens, and botanical knowledge of the realm.",
+  general: "Foundational world-building and overviews of the Whisker Shogunate.",
+  history: "Journey through the historical events, eras, and chronicles of Neko-kuni.",
+  locations: "Visit the places, regions, and landmarks that make up the five provinces.",
+  politics: "Navigate the governance, diplomacy, and power structures of cat society.",
+  professions: "Discover the trades, crafts, and career paths available to citizens.",
+  society: "Understand the social structures, hierarchies, and daily life of cats.",
+  technology: "Marvel at the Whisker-Punk inventions and innovations that power civilization.",
+  world: "Explore the geography, cosmology, and fundamental mechanics of the realm.",
+};
+---
+
+<Base
+  title={`${category} | Categories`}
+  description={categoryDescriptions[category!] || `Browse lore entries in the ${category} category.`}
+>
+  <div class="page" data-category={category}>
+    <header class="page__header">
+      <div class="page__header-inner">
+        <Breadcrumbs
+          items={[
+            { label: "Home", href: `${import.meta.env.BASE_URL}` },
+            { label: "Categories", href: `${import.meta.env.BASE_URL}categories/` },
+            { label: category! },
+          ]}
+        />
+        
+        <div class="page__title-group">
+          <h1 class="page__title">{category}</h1>
+          <p class="page__count">{entries.length} {entries.length === 1 ? "entry" : "entries"}</p>
+        </div>
+        
+        <p class="page__description">
+          {categoryDescriptions[category!] || `Explore all lore entries in the ${category} category.`}
+        </p>
+      </div>
+    </header>
+
+    <main class="page__content">
+      <div class="page__grid stagger-children">
+        {entries.map((entry, index) => (
+          <EntryCard
+            title={entry.data.title}
+            category={entry.data.category}
+            slug={entry.id.split("/").pop()!.replace(/\.md$/, "")}
+            excerpt={getExcerpt(entry.body || "")}
+            tags={entry.data.tags}
+            featured={index < 2}
+          />
+        ))}
+      </div>
+    </main>
+  </div>
+</Base>
+
+<style>
+  .page {
+    min-height: 100vh;
+  }
+
+  .page__header {
+    background-color: var(--color-bg-secondary);
+    border-bottom: 1px solid var(--color-border);
+    padding: var(--space-8) var(--space-4) var(--space-12);
+  }
+
+  @media (min-width: 768px) {
+    .page__header {
+      padding: var(--space-10) var(--space-8) var(--space-16);
+    }
+  }
+
+  .page__header-inner {
+    max-width: var(--max-width-content);
+    margin-inline: auto;
+  }
+
+  .page__title-group {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+    margin-bottom: var(--space-4);
+  }
+
+  .page__title {
+    font-family: var(--font-display);
+    font-size: var(--text-4xl);
+    font-weight: 500;
+    text-transform: capitalize;
+    color: var(--category-color);
+    margin: 0;
+  }
+
+  .page__count {
+    font-size: var(--text-lg);
+    color: var(--color-text-tertiary);
+    margin: 0;
+  }
+
+  .page__description {
+    font-size: var(--text-lg);
+    color: var(--color-text-secondary);
+    max-width: 600px;
+    line-height: var(--leading-relaxed);
+    margin: 0;
+  }
+
+  .page__content {
+    padding: var(--space-8) var(--space-4);
+    max-width: var(--max-width-wide);
+    margin-inline: auto;
+  }
+
+  @media (min-width: 768px) {
+    .page__content {
+      padding: var(--space-12) var(--space-8);
+    }
+  }
+
+  .page__grid {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  @media (min-width: 640px) {
+    .page__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .page__grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (min-width: 1400px) {
+    .page__grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+</style>

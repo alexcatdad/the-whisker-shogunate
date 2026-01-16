@@ -1,0 +1,584 @@
+---
+import { getCollection } from "astro:content";
+import Base from "../layouts/Base.astro";
+import CategoryCard from "../components/CategoryCard.astro";
+import GearDivider from "../components/GearDivider.astro";
+
+const allLore = await getCollection("lore");
+
+// Count entries per category
+const categoryCounts = allLore.reduce(
+  (acc, entry) => {
+    const cat = entry.data.category;
+    acc[cat] = (acc[cat] || 0) + 1;
+    return acc;
+  },
+  {} as Record<string, number>
+);
+
+// Sort categories by count (descending)
+const sortedCategories = Object.entries(categoryCounts).sort((a, b) => b[1] - a[1]);
+---
+
+<Base title="The Whisker Shogunate">
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero__bg" aria-hidden="true">
+      <div class="hero__gradient"></div>
+      <div class="hero__pattern"></div>
+    </div>
+    
+    <div class="hero__content">
+      <div class="hero__intro animate-slide-up">
+        <span class="hero__kicker">Welcome to Neko-kuni</span>
+        <h1 class="hero__title">
+          <span class="hero__title-line">The Whisker</span>
+          <span class="hero__title-line hero__title-line--accent">Shogunate</span>
+        </h1>
+        <p class="hero__tagline">A world where lost cats find home</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Story Section -->
+  <article class="story">
+    <div class="story__container">
+      <div class="story__layout">
+        <!-- Main Content -->
+        <div class="story__main">
+          <section class="story__section">
+            <p class="story__opening">
+              You remember warmth. A lap, perhaps, or a patch of sunlight on worn floorboards. 
+              You remember the weight of sleep, the comfort of familiar scents, the rhythm of days 
+              that blurred together like watercolors in rain. And then—nothing. A space between 
+              heartbeats that stretched into forever.
+            </p>
+
+            <p class="story__text">Until the light.</p>
+
+            <p class="story__text">
+              It begins as a glow at the edges of darkness, warm as afternoon sun through glass. 
+              The light grows, taking shape—two great pillars rising from mist, a crossbeam above 
+              them curved like the arch of a stretching back. <strong>The Great Torii Gate</strong>, 
+              ancient beyond memory, older than the oldest tales. No one knows who built it. No one 
+              knows why it chooses the cats it does. But it has chosen you.
+            </p>
+
+            <p class="story__text story__text--emphasis">You step through, and everything changes.</p>
+          </section>
+
+          <GearDivider animate />
+
+          <section class="story__section">
+            <h2 class="story__heading">Welcome to Neko-kuni</h2>
+
+            <p class="story__text">
+              On the other side waits <strong>Neko-kuni</strong>—the Land of Cats. A realm that 
+              exists somewhere between memory and dream, where feudal tradition meets impossible 
+              technology, where the whisper of wind through bamboo mingles with the gentle hum of 
+              brass gears and copper pipes.
+            </p>
+
+            <p class="story__text">
+              Here, cats walk upright. They speak, they build, they dream. They have forged a 
+              civilization from nothing—five provinces united under the banner of the 
+              <strong>Whisker Shogunate</strong>, each with its own character, its own purpose, 
+              its own place in the great tapestry of cat society.
+            </p>
+          </section>
+
+          <GearDivider />
+
+          <section class="story__section">
+            <h2 class="story__heading">The Transformation</h2>
+
+            <p class="story__text">
+              But becoming who you're meant to be—that is the real journey.
+            </p>
+
+            <p class="story__text">
+              You were small, once. Dependent. Your world was measured in food bowls and sunny 
+              spots, in the rhythms of humans whose language you could feel but never speak. Now 
+              you must learn to walk on two legs instead of four, to grip tools with paws that 
+              suddenly have thumbs, to wrap your tongue around words that once existed only as 
+              sensations.
+            </p>
+
+            <p class="story__text">
+              More than that—you must learn to <em>think</em> as a citizen of Neko-kuni thinks. 
+              To plan beyond the next meal. To hold complex emotions that don't fit neatly into 
+              the simple categories of your old life.
+            </p>
+          </section>
+
+          <GearDivider />
+
+          <section class="story__section">
+            <h2 class="story__heading">Whisker-Punk Wonder</h2>
+
+            <p class="story__text">
+              Look around you. See the great <strong>gear-towers</strong> that rise from every 
+              district, their brass mechanisms turning in endless, beautiful precision. Watch the 
+              cats padding along <strong>kinetic pawpad paths</strong>, each step generating the 
+              power that lights the paper lanterns at dusk.
+            </p>
+
+            <p class="story__text">
+              This is <strong>Whisker-Punk</strong>—technology born from cat nature rather than 
+              fighting against it. Nothing is hidden here. Every gear is polished, every pipe 
+              gleams with care, every mechanism is celebrated as both functional and beautiful.
+            </p>
+
+            <p class="story__text story__text--closing">
+              Welcome to <strong>The Whisker Shogunate</strong>.<br />
+              <em>Welcome home.</em>
+            </p>
+          </section>
+        </div>
+
+        <!-- Sidebar -->
+        <aside class="story__sidebar">
+          <div class="story__sidebar-card">
+            <h3 class="story__sidebar-title">The Five Provinces</h3>
+            <ul class="story__province-list">
+              <li>
+                <strong>Higashi-hama</strong>
+                <span>East Shore — Where newcomers arrive</span>
+              </li>
+              <li>
+                <strong>Kawa-no-kuni</strong>
+                <span>River Country — Agricultural heartland</span>
+              </li>
+              <li>
+                <strong>Yama-takumi</strong>
+                <span>Mountain Forge — Industrial hub</span>
+              </li>
+              <li>
+                <strong>Mori-shizuka</strong>
+                <span>Silent Forest — Spiritual center</span>
+              </li>
+              <li>
+                <strong>Minato-kassei</strong>
+                <span>Thriving Port — Trade capital</span>
+              </li>
+            </ul>
+            <a href={`${import.meta.env.BASE_URL}provinces/`} class="story__sidebar-link">
+              Explore provinces →
+            </a>
+          </div>
+
+          <div class="story__sidebar-card">
+            <h3 class="story__sidebar-title">The Seven Guilds</h3>
+            <ul class="story__guild-list">
+              <li>Engineer's Guild</li>
+              <li>Merchant's Guild</li>
+              <li>Healer's Guild</li>
+              <li>Farmer's Collective</li>
+              <li>Artisan's Union</li>
+              <li>Scholar's Circle</li>
+              <li>Performance Guild</li>
+            </ul>
+            <a href={`${import.meta.env.BASE_URL}guilds/`} class="story__sidebar-link">
+              Discover guilds →
+            </a>
+          </div>
+
+          <div class="story__sidebar-stats">
+            <div class="story__stat">
+              <span class="story__stat-value">{allLore.length}</span>
+              <span class="story__stat-label">Lore Entries</span>
+            </div>
+            <div class="story__stat">
+              <span class="story__stat-value">{sortedCategories.length}</span>
+              <span class="story__stat-label">Categories</span>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </article>
+
+  <!-- Categories Section -->
+  <section class="categories">
+    <div class="categories__container">
+      <header class="categories__header">
+        <h2 class="categories__title">Explore the Lore</h2>
+        <p class="categories__subtitle">
+          Discover {allLore.length} entries across {sortedCategories.length} categories
+        </p>
+      </header>
+
+      <div class="categories__grid stagger-children">
+        {sortedCategories.map(([category, count]) => (
+          <CategoryCard category={category} count={count} />
+        ))}
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* ═══════════════════════════════════════════════════════════════════════════
+     HERO SECTION
+     ═══════════════════════════════════════════════════════════════════════════ */
+  
+  .hero {
+    position: relative;
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-16) var(--space-4);
+    overflow: hidden;
+  }
+
+  @media (min-width: 768px) {
+    .hero {
+      min-height: 70vh;
+      padding: var(--space-24) var(--space-8);
+    }
+  }
+
+  .hero__bg {
+    position: absolute;
+    inset: 0;
+    z-index: var(--z-below);
+  }
+
+  .hero__gradient {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse 80% 50% at 50% 20%,
+      var(--color-accent-primary) 0%,
+      transparent 70%
+    );
+    opacity: 0.08;
+  }
+
+  .hero__pattern {
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L30 60M0 30L60 30' stroke='%23b87333' stroke-width='0.5' fill='none' opacity='0.1'/%3E%3C/svg%3E");
+    opacity: var(--gear-opacity);
+  }
+
+  .hero__content {
+    position: relative;
+    text-align: center;
+    max-width: 800px;
+  }
+
+  .hero__kicker {
+    display: block;
+    font-family: var(--font-heading);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-widest);
+    color: var(--color-accent-primary);
+    margin-bottom: var(--space-4);
+  }
+
+  .hero__title {
+    font-family: var(--font-display);
+    font-size: var(--text-display);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: var(--tracking-tight);
+    margin-bottom: var(--space-6);
+  }
+
+  .hero__title-line {
+    display: block;
+  }
+
+  .hero__title-line--accent {
+    color: var(--color-accent-primary);
+    font-size: 1.1em;
+  }
+
+  .hero__tagline {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    color: var(--color-text-secondary);
+    font-style: italic;
+    margin: 0;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     STORY SECTION
+     ═══════════════════════════════════════════════════════════════════════════ */
+
+  .story {
+    padding: var(--space-12) var(--space-4);
+    background-color: var(--color-bg-secondary);
+  }
+
+  @media (min-width: 768px) {
+    .story {
+      padding: var(--space-16) var(--space-8);
+    }
+  }
+
+  .story__container {
+    max-width: var(--max-width-wide);
+    margin-inline: auto;
+  }
+
+  .story__layout {
+    display: grid;
+    gap: var(--space-12);
+  }
+
+  @media (min-width: 1024px) {
+    .story__layout {
+      grid-template-columns: 1fr 320px;
+      gap: var(--space-16);
+    }
+  }
+
+  @media (min-width: 1400px) {
+    .story__layout {
+      grid-template-columns: 1fr 380px;
+    }
+  }
+
+  /* Story Main Content */
+  .story__main {
+    max-width: var(--max-width-prose);
+  }
+
+  @media (min-width: 1024px) {
+    .story__main {
+      max-width: none;
+    }
+  }
+
+  .story__section {
+    margin-bottom: var(--space-8);
+  }
+
+  .story__heading {
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    font-weight: 500;
+    margin-bottom: var(--space-6);
+    color: var(--color-text-primary);
+  }
+
+  .story__opening {
+    font-size: var(--text-xl);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-6);
+  }
+
+  .story__opening::first-letter {
+    float: left;
+    font-family: var(--font-display);
+    font-size: 4em;
+    line-height: 0.8;
+    padding-right: var(--space-3);
+    color: var(--color-accent-primary);
+  }
+
+  .story__text {
+    font-size: var(--text-lg);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-5);
+  }
+
+  .story__text strong {
+    color: var(--color-text-primary);
+    font-weight: 600;
+  }
+
+  .story__text em {
+    color: var(--color-accent-primary);
+  }
+
+  .story__text--emphasis {
+    font-size: var(--text-xl);
+    color: var(--color-text-primary);
+    text-align: center;
+    margin-block: var(--space-8);
+  }
+
+  .story__text--closing {
+    text-align: center;
+    font-size: var(--text-xl);
+    margin-top: var(--space-10);
+  }
+
+  /* Story Sidebar */
+  .story__sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  @media (min-width: 1024px) {
+    .story__sidebar {
+      position: sticky;
+      top: calc(var(--header-height) + var(--space-6));
+      align-self: start;
+    }
+  }
+
+  .story__sidebar-card {
+    background-color: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+  }
+
+  .story__sidebar-title {
+    font-family: var(--font-heading);
+    font-size: var(--text-lg);
+    font-weight: 600;
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text-primary);
+  }
+
+  .story__province-list,
+  .story__guild-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-4) 0;
+  }
+
+  .story__province-list li {
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .story__province-list li:last-child {
+    border-bottom: none;
+  }
+
+  .story__province-list strong {
+    display: block;
+    font-size: var(--text-base);
+    color: var(--color-accent-primary);
+    margin-bottom: var(--space-1);
+  }
+
+  .story__province-list span {
+    font-size: var(--text-sm);
+    color: var(--color-text-tertiary);
+  }
+
+  .story__guild-list li {
+    padding: var(--space-2) 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .story__sidebar-link {
+    display: inline-flex;
+    align-items: center;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-accent-primary);
+    text-decoration: none;
+  }
+
+  .story__sidebar-link:hover {
+    text-decoration: underline;
+  }
+
+  .story__sidebar-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4);
+    background-color: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+  }
+
+  .story__stat {
+    text-align: center;
+  }
+
+  .story__stat-value {
+    display: block;
+    font-family: var(--font-display);
+    font-size: var(--text-4xl);
+    font-weight: 600;
+    color: var(--color-accent-primary);
+    line-height: 1;
+  }
+
+  .story__stat-label {
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wider);
+    color: var(--color-text-tertiary);
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     CATEGORIES SECTION
+     ═══════════════════════════════════════════════════════════════════════════ */
+
+  .categories {
+    padding: var(--space-16) var(--space-4);
+  }
+
+  @media (min-width: 768px) {
+    .categories {
+      padding: var(--space-20) var(--space-8);
+    }
+  }
+
+  .categories__container {
+    max-width: var(--max-width-wide);
+    margin-inline: auto;
+  }
+
+  .categories__header {
+    text-align: center;
+    margin-bottom: var(--space-12);
+  }
+
+  .categories__title {
+    font-family: var(--font-display);
+    font-size: var(--text-4xl);
+    font-weight: 500;
+    margin-bottom: var(--space-3);
+  }
+
+  .categories__subtitle {
+    font-size: var(--text-lg);
+    color: var(--color-text-tertiary);
+    margin: 0;
+  }
+
+  .categories__grid {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 640px) {
+    .categories__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .categories__grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (min-width: 1400px) {
+    .categories__grid {
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-5);
+    }
+  }
+</style>

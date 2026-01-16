@@ -1,0 +1,252 @@
+---
+const currentYear = new Date().getFullYear();
+
+const links = [
+  { label: "Categories", href: `${import.meta.env.BASE_URL}categories/` },
+  { label: "Provinces", href: `${import.meta.env.BASE_URL}provinces/` },
+  { label: "Guilds", href: `${import.meta.env.BASE_URL}guilds/` },
+];
+---
+
+<footer class="footer">
+  <div class="footer__inner">
+    <!-- Decorative Gear Border -->
+    <div class="footer__border" aria-hidden="true">
+      <svg class="footer__gear" viewBox="0 0 24 24" width="24" height="24">
+        <path fill="currentColor" d="M12 15.5A3.5 3.5 0 0 1 8.5 12A3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5a3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97c0-.33-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1c0 .33.03.65.07.97l-2.11 1.66c-.19.15-.25.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1.01c.52.4 1.06.74 1.69.99l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.26 1.17-.59 1.69-.99l2.49 1.01c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.66Z"/>
+      </svg>
+    </div>
+
+    <div class="footer__content">
+      <!-- Brand -->
+      <div class="footer__brand">
+        <div class="footer__logo">
+          <svg class="footer__torii" viewBox="0 0 100 100" width="32" height="32" aria-hidden="true">
+            <rect x="5" y="15" width="90" height="8" rx="2" fill="currentColor" />
+            <rect x="15" y="28" width="70" height="6" rx="1" fill="currentColor" />
+            <rect x="18" y="28" width="8" height="55" fill="currentColor" />
+            <rect x="74" y="28" width="8" height="55" fill="currentColor" />
+            <polygon points="35,15 42,5 49,15" fill="currentColor" />
+            <polygon points="51,15 58,5 65,15" fill="currentColor" />
+          </svg>
+          <span class="footer__name">The Whisker Shogunate</span>
+        </div>
+        <p class="footer__tagline">A world where lost cats find home.</p>
+      </div>
+
+      <!-- Links -->
+      <nav class="footer__nav">
+        <h3 class="footer__nav-title">Explore</h3>
+        <ul class="footer__nav-list">
+          {links.map((link) => (
+            <li>
+              <a href={link.href} class="footer__nav-link">{link.label}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <!-- About -->
+      <div class="footer__about">
+        <h3 class="footer__nav-title">About</h3>
+        <p class="footer__about-text">
+          An idle/life-sim game set in Neko-kuni, a feudal Japan-inspired world 
+          powered by Whisker-Punk technology.
+        </p>
+        <a 
+          href="https://github.com/alexcatdad/the-whisker-shogunate" 
+          target="_blank" 
+          rel="noopener"
+          class="footer__github"
+        >
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+            <path fill="currentColor" d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5c.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34c-.46-1.16-1.11-1.47-1.11-1.47c-.91-.62.07-.6.07-.6c1 .07 1.53 1.03 1.53 1.03c.87 1.52 2.34 1.07 2.91.83c.09-.65.35-1.09.63-1.34c-2.22-.25-4.55-1.11-4.55-4.92c0-1.11.38-2 1.03-2.71c-.1-.25-.45-1.29.1-2.64c0 0 .84-.27 2.75 1.02c.79-.22 1.65-.33 2.5-.33c.85 0 1.71.11 2.5.33c1.91-1.29 2.75-1.02 2.75-1.02c.55 1.35.2 2.39.1 2.64c.65.71 1.03 1.6 1.03 2.71c0 3.82-2.34 4.66-4.57 4.91c.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2Z"/>
+          </svg>
+          View on GitHub
+        </a>
+      </div>
+    </div>
+
+    <!-- Copyright -->
+    <div class="footer__copyright">
+      <p>&copy; {currentYear} The Whisker Shogunate Project</p>
+      <p class="footer__note">Built with love for cats everywhere.</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    margin-top: auto;
+    background-color: var(--color-bg-secondary);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .footer__inner {
+    max-width: var(--max-width-wide);
+    margin-inline: auto;
+    padding: var(--space-12) var(--space-4);
+  }
+
+  @media (min-width: 768px) {
+    .footer__inner {
+      padding-inline: var(--space-8);
+    }
+  }
+
+  /* Decorative Border */
+  .footer__border {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--space-10);
+  }
+
+  .footer__border::before,
+  .footer__border::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(
+      to var(--dir, right),
+      transparent,
+      var(--color-border-strong) 50%
+    );
+  }
+
+  .footer__border::after {
+    --dir: left;
+  }
+
+  .footer__gear {
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-inline: var(--space-4);
+    color: var(--color-accent-secondary);
+    opacity: 0.6;
+  }
+
+  /* Content Grid */
+  .footer__content {
+    display: grid;
+    gap: var(--space-8);
+  }
+
+  @media (min-width: 768px) {
+    .footer__content {
+      grid-template-columns: 2fr 1fr 2fr;
+      gap: var(--space-12);
+    }
+  }
+
+  /* Brand */
+  .footer__brand {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .footer__logo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .footer__torii {
+    width: 2rem;
+    height: 2rem;
+    color: var(--color-accent-primary);
+  }
+
+  .footer__name {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+
+  .footer__tagline {
+    font-size: var(--text-base);
+    color: var(--color-text-tertiary);
+    font-style: italic;
+    margin: 0;
+  }
+
+  /* Navigation */
+  .footer__nav-title {
+    font-family: var(--font-heading);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wider);
+    color: var(--color-text-tertiary);
+    margin-bottom: var(--space-4);
+  }
+
+  .footer__nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .footer__nav-link {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out-expo);
+  }
+
+  .footer__nav-link:hover {
+    color: var(--color-accent-primary);
+  }
+
+  /* About */
+  .footer__about-text {
+    font-size: var(--text-sm);
+    color: var(--color-text-tertiary);
+    line-height: var(--leading-relaxed);
+    margin: 0 0 var(--space-4) 0;
+  }
+
+  .footer__github {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out-expo);
+  }
+
+  .footer__github:hover {
+    color: var(--color-accent-primary);
+  }
+
+  .footer__github svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  /* Copyright */
+  .footer__copyright {
+    margin-top: var(--space-10);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--color-border);
+    text-align: center;
+  }
+
+  .footer__copyright p {
+    font-size: var(--text-sm);
+    color: var(--color-text-tertiary);
+    margin: 0;
+  }
+
+  .footer__note {
+    margin-top: var(--space-1);
+    font-style: italic;
+  }
+</style>

@@ -1,0 +1,29 @@
+---
+import { getCollection, render } from "astro:content";
+import LoreEntry from "../../layouts/LoreEntry.astro";
+
+export async function getStaticPaths() {
+  const allLore = await getCollection("lore");
+
+  return allLore.map((entry) => ({
+    params: { slug: entry.id.replace(/\.md$/, "") },
+    props: { entry },
+  }));
+}
+
+interface Props {
+  entry: Awaited<ReturnType<typeof getCollection<"lore">>>[number];
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<LoreEntry
+  title={entry.data.title}
+  category={entry.data.category}
+  tags={entry.data.tags}
+  updatedAt={entry.data.updatedAt}
+>
+  <Content />
+</LoreEntry>

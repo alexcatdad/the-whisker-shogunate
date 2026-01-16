@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Torii Gate silhouette - The Whisker Shogunate symbol -->
+  <defs>
+    <linearGradient id="brass" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#c9b74f"/>
+      <stop offset="100%" stop-color="#9a8c38"/>
+    </linearGradient>
+  </defs>
+  <!-- Top beam (kasagi) -->
+  <rect x="5" y="15" width="90" height="8" rx="2" fill="url(#brass)"/>
+  <!-- Second beam (nuki) -->
+  <rect x="15" y="28" width="70" height="6" rx="1" fill="url(#brass)"/>
+  <!-- Left pillar -->
+  <rect x="18" y="28" width="8" height="55" fill="url(#brass)"/>
+  <!-- Right pillar -->
+  <rect x="74" y="28" width="8" height="55" fill="url(#brass)"/>
+  <!-- Cat ears on top -->
+  <polygon points="35,15 42,5 49,15" fill="url(#brass)"/>
+  <polygon points="51,15 58,5 65,15" fill="url(#brass)"/>
+</svg>

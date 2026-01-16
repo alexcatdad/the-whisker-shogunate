@@ -7,7 +7,11 @@
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
     "typecheck": "tsc --noEmit -p lore-server",
-    "prepare": "lefthook install"
+    "prepare": "lefthook install",
+    "export-lore": "bun run scripts/export-lore.ts",
+    "website:dev": "bun run export-lore && cd website && bun run dev",
+    "website:build": "bun run export-lore && cd website && bun run build",
+    "website:preview": "cd website && bun run preview"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.0",

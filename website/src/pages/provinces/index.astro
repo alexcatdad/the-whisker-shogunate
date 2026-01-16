@@ -1,0 +1,298 @@
+---
+import { getCollection } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import EntryCard from "../../components/EntryCard.astro";
+import GearDivider from "../../components/GearDivider.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+
+const allLore = await getCollection("lore");
+
+const provinceEntries = allLore.filter((entry) => {
+  const title = entry.data.title.toLowerCase();
+  const tags = entry.data.tags.map((t) => t.toLowerCase());
+  return (
+    entry.data.category === "locations" ||
+    tags.some(t => t.includes("province") || t.includes("region"))
+  );
+});
+
+function getExcerpt(content: string, maxLength = 120): string {
+  const text = content.replace(/^#.*$/gm, "").trim();
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength).trim() + "...";
+}
+
+const provinces = [
+  {
+    name: "Higashi-hama",
+    translation: "East Shore",
+    description: "The landing province for newcomers, where the Great Torii Gate deposits cats from beyond the Veil. Coastal towns blend fishing traditions with welcome centers for the newly arrived.",
+    character: "Transitional, welcoming, hopeful"
+  },
+  {
+    name: "Kawa-no-kuni", 
+    translation: "River Country",
+    description: "The agricultural heartland of Neko-kuni, where terraced rice paddies cascade down gentle hills and traditional farming communities maintain customs unchanged for generations.",
+    character: "Traditional, conservative, abundant"
+  },
+  {
+    name: "Yama-takumi",
+    translation: "Mountain Forge", 
+    description: "The industrial province where great gear-towers rise from mountain peaks and the Engineer's Guild pushes the boundaries of Whisker-Punk innovation.",
+    character: "Innovative, industrious, ambitious"
+  },
+  {
+    name: "Mori-shizuka",
+    translation: "Silent Forest",
+    description: "The spiritual and medical center of the realm, where ancient forests harbor healing temples and the boundary between worlds grows mysteriously thin.",
+    character: "Contemplative, ancient, mystical"
+  },
+  {
+    name: "Minato-kassei",
+    translation: "Thriving Port",
+    description: "The cosmopolitan trade capital where merchant wealth challenges political tradition, and cats from every province mingle in crowded market streets.",
+    character: "Wealthy, cosmopolitan, complex"
+  }
+];
+---
+
+<Base title="The Five Provinces" description="Explore the five provinces of the Whisker Shogunate.">
+  <div class="page">
+    <header class="page__header">
+      <div class="page__header-inner">
+        <Breadcrumbs
+          items={[
+            { label: "Home", href: `${import.meta.env.BASE_URL}` },
+            { label: "Provinces" },
+          ]}
+        />
+        
+        <div class="page__title-section">
+          <h1 class="page__title">The Five Provinces</h1>
+          <p class="page__description">
+            The Whisker Shogunate is divided into five distinct provinces, each with its own 
+            culture, specialties, and character. Together, they form a diverse nation united 
+            under the banner of cat civilization.
+          </p>
+        </div>
+      </div>
+    </header>
+
+    <main class="page__content">
+      <section class="provinces">
+        <div class="provinces__grid">
+          {provinces.map((province, index) => (
+            <article class="province-card" style={`--delay: ${index * 100}ms`}>
+              <div class="province-card__number">{String(index + 1).padStart(2, '0')}</div>
+              <div class="province-card__content">
+                <h2 class="province-card__name">{province.name}</h2>
+                <p class="province-card__translation">{province.translation}</p>
+                <p class="province-card__description">{province.description}</p>
+                <div class="province-card__character">
+                  <span class="province-card__label">Character</span>
+                  <span class="province-card__traits">{province.character}</span>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {provinceEntries.length > 0 && (
+        <section class="related">
+          <GearDivider />
+          <h2 class="related__title">Related Lore</h2>
+          <div class="related__grid stagger-children">
+            {provinceEntries.slice(0, 8).map((entry) => (
+              <EntryCard
+                title={entry.data.title}
+                category={entry.data.category}
+                slug={entry.id.split("/").pop()!.replace(/\.md$/, "")}
+                excerpt={getExcerpt(entry.body || "")}
+                tags={entry.data.tags}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+    </main>
+  </div>
+</Base>
+
+<style>
+  .page__header {
+    background-color: var(--color-bg-secondary);
+    border-bottom: 1px solid var(--color-border);
+    padding: var(--space-8) var(--space-4) var(--space-12);
+  }
+
+  @media (min-width: 768px) {
+    .page__header {
+      padding: var(--space-10) var(--space-8) var(--space-16);
+    }
+  }
+
+  .page__header-inner {
+    max-width: var(--max-width-content);
+    margin-inline: auto;
+  }
+
+  .page__title-section {
+    margin-top: var(--space-8);
+  }
+
+  .page__title {
+    font-family: var(--font-display);
+    font-size: var(--text-4xl);
+    font-weight: 500;
+    color: var(--color-text-primary);
+    margin: 0 0 var(--space-4) 0;
+  }
+
+  @media (min-width: 768px) {
+    .page__title {
+      font-size: var(--text-5xl);
+    }
+  }
+
+  .page__description {
+    font-size: var(--text-lg);
+    color: var(--color-text-secondary);
+    max-width: 700px;
+    line-height: var(--leading-relaxed);
+    margin: 0;
+  }
+
+  .page__content {
+    padding: var(--space-8) var(--space-4);
+    max-width: var(--max-width-wide);
+    margin-inline: auto;
+  }
+
+  @media (min-width: 768px) {
+    .page__content {
+      padding: var(--space-12) var(--space-8);
+    }
+  }
+
+  /* Provinces */
+  .provinces__grid {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  @media (min-width: 768px) {
+    .provinces__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .provinces__grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .province-card {
+    position: relative;
+    background-color: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+    opacity: 0;
+    animation: slide-up var(--duration-slow) var(--ease-out-expo) forwards;
+    animation-delay: var(--delay);
+    transition: 
+      transform var(--duration-normal) var(--ease-out-expo),
+      box-shadow var(--duration-normal) var(--ease-out-expo),
+      border-color var(--duration-normal) var(--ease-out-expo);
+  }
+
+  .province-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--color-accent-primary);
+  }
+
+  .province-card__number {
+    position: absolute;
+    top: var(--space-4);
+    right: var(--space-4);
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    font-weight: 600;
+    color: var(--color-accent-secondary);
+    opacity: 0.2;
+    line-height: 1;
+  }
+
+  .province-card__name {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: 600;
+    color: var(--color-accent-primary);
+    margin: 0 0 var(--space-1) 0;
+  }
+
+  .province-card__translation {
+    font-size: var(--text-base);
+    color: var(--color-text-tertiary);
+    font-style: italic;
+    margin: 0 0 var(--space-4) 0;
+  }
+
+  .province-card__description {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: var(--leading-relaxed);
+    margin: 0 0 var(--space-5) 0;
+  }
+
+  .province-card__character {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .province-card__label {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wider);
+    color: var(--color-text-tertiary);
+  }
+
+  .province-card__traits {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    font-style: italic;
+  }
+
+  /* Related */
+  .related__title {
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    font-weight: 500;
+    text-align: center;
+    margin-bottom: var(--space-8);
+  }
+
+  .related__grid {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  @media (min-width: 640px) {
+    .related__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .related__grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+</style>

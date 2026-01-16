@@ -22,3 +22,10 @@ dist/
 # Logs (runtime)
 lore-server/data/logs/
 /data/
+
+# Website build artifacts
+website/dist/
+website/.astro/
+
+# Exported lore content (regenerated from database)
+website/src/content/lore/
