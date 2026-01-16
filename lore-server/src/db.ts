@@ -9,7 +9,7 @@ import type {
   SearchResult,
 } from "./types.js";
 
-const DB_PATH = process.env.LORE_DB_PATH || "./data/lore.lance";
+const DB_PATH = process.env.LORE_DB_PATH || "./data/lore_db";
 
 let db: lancedb.Connection | null = null;
 let table: lancedb.Table | null = null;

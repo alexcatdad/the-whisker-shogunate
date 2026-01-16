@@ -20,4 +20,4 @@ node_modules/
 dist/
 
 # LanceDB data (binary, can be rebuilt from exports)
-lore-server/data/lore.lance/
+lore-server/data/

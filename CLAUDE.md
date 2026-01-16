@@ -113,11 +113,12 @@ architecture, characters, cuisine, culture, factions, flora, general, history, l
 2. **Stay consistent**: Reference existing entries when adding related content
 3. **Use tags**: Add meaningful tags for cross-referencing
 4. **Export periodically**: Use `export_markdown` to create shareable snapshots
+5. **Brainstorming → DB**: All lore developed during brainstorming sessions must be added to the database as entries. The DB is the source of truth; design docs are session notes only.
 
 ### Technical Details
 
 - **Location**: `lore-server/`
-- **Database**: LanceDB (embedded, stored in `lore-server/data/lore.lance/`)
+- **Database**: LanceDB (embedded, stored in `lore-server/data/lore_db/`)
 - **Embeddings**: Ollama `nomic-embed-text` (local, no API costs)
 - **Config**: `.claude/mcp.json`
 
