@@ -19,5 +19,6 @@ Thumbs.db
 node_modules/
 dist/
 
-# LanceDB data (binary, can be rebuilt from exports)
-lore-server/data/
+# Logs (runtime)
+lore-server/data/logs/
+/data/
