@@ -1,26 +1,6 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
----
-
-## 🚀 Current Project Status (Updated: 2025-10-07)
-
-**Migration Progress**: ~80% Complete
-
-**What's Working**:
-- ✅ pnpm workspace monorepo with Turborepo
-- ✅ All 6 packages building successfully (TypeScript)
-- ✅ Validation scripts working (24/24 entities pass)
-- ✅ GitHub Actions workflows created
-- ✅ @whisker/schemas, @whisker/data, @whisker/validation, @whisker/analytics, @whisker/migration, @whisker/mcp-server
-
-**What's Next**:
-- ⏳ Initialize Next.js wiki package (`packages/wiki/`)
-- ⏳ Build progress dashboard UI
-- ⏳ Enable GitHub Pages deployment
-
-**See TODO.md for detailed next steps and commands**
+This file provides guidance to Claude Code (claude.ai/code) when working with this repository.
 
 ---
 
