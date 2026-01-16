@@ -75,18 +75,24 @@ Critical system affecting all gameplay:
 
 Different NPCs, quests, and activities available based on time and player's circadian preference.
 
-## World-Building Reference Files
+## World-Building Reference
 
-Located in `/originals/`:
+**The lore database is the source of truth.** Use the MCP tools (`search_lore`, `list_entries`, etc.) to access all world-building content.
 
-- `whisker-shogunate-lore.md` - Core cosmology, geography, politics, technology
-- `whisker-shogunate-part2.md` - Architecture (extensive material/building guidelines), flora & fauna
-- `whisker-shogunate-part3.md` - Society, culture, professions, language, guilds
-- `whisker-shogunate-part4.md` - Cuisine, history, current events, mysteries
+### Archived Original Files
+
+The original markdown files are archived in `originals-archive.zip` for historical reference only. All content has been imported into the database (188 entries).
+
+| Original File | Content (now in DB) |
+|---------------|---------------------|
+| `whisker-shogunate-lore.md` | Core cosmology, geography, politics, technology |
+| `whisker-shogunate-part2.md` | Architecture, materials, flora & fauna |
+| `whisker-shogunate-part3.md` | Society, culture, professions, language, guilds |
+| `whisker-shogunate-part4.md` | Cuisine, history, current events, mysteries |
 
 ## Lore Server (MCP)
 
-The project includes a local MCP server for semantic search and management of all lore. The database is the source of truth - markdown files are for import/export only.
+The project includes a local MCP server for semantic search and management of all lore. The database is the source of truth.
 
 **Prerequisites**: Ollama running locally with `nomic-embed-text` model.
 
@@ -94,7 +100,7 @@ The project includes a local MCP server for semantic search and management of al
 
 | Tool | Purpose |
 |------|---------|
-| `search_lore(query, category?, limit?)` | Semantic search across all 181 lore entries |
+| `search_lore(query, category?, limit?)` | Semantic search across all 188 lore entries |
 | `get_entry(id)` | Fetch a single entry by ID |
 | `list_entries(category?)` | Browse entries, optionally by category |
 | `list_categories()` | List all available categories |
