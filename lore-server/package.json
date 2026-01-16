@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
-    "@lancedb/lancedb": "^0.13.0",
+    "@lancedb/lancedb": "^0.23.0",
     "@modelcontextprotocol/sdk": "^1.0.0",
     "apache-arrow": "^17.0.0",
     "uuid": "^11.0.0"
