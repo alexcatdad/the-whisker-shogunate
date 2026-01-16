@@ -1,8 +1,12 @@
 ---
 import { getCollection } from "astro:content";
 import Base from "../layouts/Base.astro";
-import CategoryCard from "../components/CategoryCard.astro";
+import WavePattern from "../components/WavePattern.astro";
 import GearDivider from "../components/GearDivider.astro";
+import CategoryCard from "../components/CategoryCard.astro";
+import WelcomeGraphic from "../components/WelcomeGraphic.astro";
+import TransformationGraphic from "../components/TransformationGraphic.astro";
+import WhiskerPunkGraphic from "../components/WhiskerPunkGraphic.astro";
 
 const allLore = await getCollection("lore");
 
@@ -13,7 +17,7 @@ const categoryCounts = allLore.reduce(
     acc[cat] = (acc[cat] || 0) + 1;
     return acc;
   },
-  {} as Record<string, number>
+  {} as Record<string, number>,
 );
 
 // Sort categories by count (descending)
@@ -26,6 +30,44 @@ const sortedCategories = Object.entries(categoryCounts).sort((a, b) => b[1] - a[
     <div class="hero__bg" aria-hidden="true">
       <div class="hero__gradient"></div>
       <div class="hero__pattern"></div>
+      
+      <!-- Animated Torii Gate -->
+      <div class="hero__torii">
+        <svg viewBox="0 0 300 250" class="torii-gate">
+          <defs>
+            <linearGradient id="toriiGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="var(--color-accent-primary)" />
+              <stop offset="100%" stop-color="var(--color-accent-tertiary)" />
+            </linearGradient>
+            <filter id="toriiGlow">
+              <feGaussianBlur stdDeviation="3" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
+          </defs>
+          <!-- Top beam (kasagi) -->
+          <path d="M20 40 Q150 20 280 40 L275 55 Q150 35 25 55 Z" fill="url(#toriiGradient)" />
+          <!-- Second beam (nuki) -->
+          <rect x="35" y="70" width="230" height="15" rx="3" fill="url(#toriiGradient)" />
+          <!-- Left pillar -->
+          <rect x="45" y="70" width="20" height="170" fill="url(#toriiGradient)" />
+          <!-- Right pillar -->
+          <rect x="235" y="70" width="20" height="170" fill="url(#toriiGradient)" />
+          <!-- Decorative elements -->
+          <circle cx="55" cy="65" r="5" fill="url(#toriiGradient)" />
+          <circle cx="245" cy="65" r="5" fill="url(#toriiGradient)" />
+          <!-- Mystical glow effect -->
+          <ellipse cx="150" cy="160" rx="80" ry="60" fill="var(--color-accent-primary)" opacity="0.1" class="torii-glow" filter="url(#toriiGlow)" />
+        </svg>
+      </div>
+      
+      <!-- Floating Cherry Blossoms -->
+      <div class="hero__petals">
+        <span class="petal petal--1"></span>
+        <span class="petal petal--2"></span>
+        <span class="petal petal--3"></span>
+        <span class="petal petal--4"></span>
+        <span class="petal petal--5"></span>
+      </div>
     </div>
     
     <div class="hero__content">
@@ -38,6 +80,8 @@ const sortedCategories = Object.entries(categoryCounts).sort((a, b) => b[1] - a[
         <p class="hero__tagline">A world where lost cats find home</p>
       </div>
     </div>
+    
+    <WavePattern position="bottom" animate />
   </section>
 
   <!-- Story Section -->
@@ -80,11 +124,13 @@ const sortedCategories = Object.entries(categoryCounts).sort((a, b) => b[1] - a[
             </p>
 
             <p class="story__text">
-              Here, cats walk upright. They speak, they build, they dream. They have forged a 
-              civilization from nothing—five provinces united under the banner of the 
-              <strong>Whisker Shogunate</strong>, each with its own character, its own purpose, 
+              Here, cats walk upright. They speak, they build, they dream. They have forged a
+              civilization from nothing—five provinces united under the banner of the
+              <strong>Whisker Shogunate</strong>, each with its own character, its own purpose,
               its own place in the great tapestry of cat society.
             </p>
+
+            <WelcomeGraphic class="story__graphic" />
           </section>
 
           <GearDivider />
@@ -105,10 +151,12 @@ const sortedCategories = Object.entries(categoryCounts).sort((a, b) => b[1] - a[
             </p>
 
             <p class="story__text">
-              More than that—you must learn to <em>think</em> as a citizen of Neko-kuni thinks. 
-              To plan beyond the next meal. To hold complex emotions that don't fit neatly into 
+              More than that—you must learn to <em>think</em> as a citizen of Neko-kuni thinks.
+              To plan beyond the next meal. To hold complex emotions that don't fit neatly into
               the simple categories of your old life.
             </p>
+
+            <TransformationGraphic class="story__graphic" />
           </section>
 
           <GearDivider />
@@ -124,10 +172,12 @@ const sortedCategories = Object.entries(categoryCounts).sort((a, b) => b[1] - a[
             </p>
 
             <p class="story__text">
-              This is <strong>Whisker-Punk</strong>—technology born from cat nature rather than 
-              fighting against it. Nothing is hidden here. Every gear is polished, every pipe 
+              This is <strong>Whisker-Punk</strong>—technology born from cat nature rather than
+              fighting against it. Nothing is hidden here. Every gear is polished, every pipe
               gleams with care, every mechanism is celebrated as both functional and beautiful.
             </p>
+
+            <WhiskerPunkGraphic class="story__graphic" />
 
             <p class="story__text story__text--closing">
               Welcome to <strong>The Whisker Shogunate</strong>.<br />
@@ -229,6 +279,7 @@ const sortedCategories = Object.entries(categoryCounts).sort((a, b) => b[1] - a[
     align-items: center;
     justify-content: center;
     padding: var(--space-16) var(--space-4);
+    padding-bottom: calc(var(--space-16) + 80px); /* Account for wave pattern */
     overflow: hidden;
   }
 
@@ -236,6 +287,13 @@ const sortedCategories = Object.entries(categoryCounts).sort((a, b) => b[1] - a[
     .hero {
       min-height: 70vh;
       padding: var(--space-24) var(--space-8);
+      padding-bottom: calc(var(--space-24) + 100px);
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .hero {
+      padding-bottom: calc(var(--space-24) + 120px);
     }
   }
 
@@ -261,6 +319,136 @@ const sortedCategories = Object.entries(categoryCounts).sort((a, b) => b[1] - a[
     inset: 0;
     background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L30 60M0 30L60 30' stroke='%23b87333' stroke-width='0.5' fill='none' opacity='0.1'/%3E%3C/svg%3E");
     opacity: var(--gear-opacity);
+  }
+
+  /* Animated Torii Gate */
+  .hero__torii {
+    position: absolute;
+    bottom: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 180px;
+    opacity: 0.15;
+    animation: torii-float 6s ease-in-out infinite;
+  }
+
+  @media (min-width: 768px) {
+    .hero__torii {
+      width: 280px;
+      height: 240px;
+      opacity: 0.12;
+    }
+  }
+
+  .torii-gate {
+    width: 100%;
+    height: 100%;
+  }
+
+  .torii-glow {
+    animation: glow-pulse 4s ease-in-out infinite;
+  }
+
+  @keyframes torii-float {
+    0%, 100% {
+      transform: translateX(-50%) translateY(0);
+    }
+    50% {
+      transform: translateX(-50%) translateY(-10px);
+    }
+  }
+
+  @keyframes glow-pulse {
+    0%, 100% {
+      opacity: 0.1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.2;
+      transform: scale(1.1);
+    }
+  }
+
+  /* Floating Cherry Blossom Petals */
+  .hero__petals {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .petal {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: radial-gradient(ellipse at center, #ffb7c5 0%, #ff8fa3 50%, transparent 70%);
+    border-radius: 50% 0 50% 50%;
+    opacity: 0;
+    animation: petal-fall 15s linear infinite;
+  }
+
+  .petal--1 {
+    left: 10%;
+    animation-delay: 0s;
+    animation-duration: 18s;
+  }
+
+  .petal--2 {
+    left: 25%;
+    animation-delay: -3s;
+    animation-duration: 15s;
+  }
+
+  .petal--3 {
+    left: 50%;
+    animation-delay: -6s;
+    animation-duration: 20s;
+  }
+
+  .petal--4 {
+    left: 70%;
+    animation-delay: -9s;
+    animation-duration: 16s;
+  }
+
+  .petal--5 {
+    left: 85%;
+    animation-delay: -12s;
+    animation-duration: 19s;
+  }
+
+  @keyframes petal-fall {
+    0% {
+      opacity: 0;
+      transform: translateY(-20px) rotate(0deg) translateX(0);
+    }
+    10% {
+      opacity: 0.7;
+    }
+    90% {
+      opacity: 0.7;
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(calc(100vh + 20px)) rotate(720deg) translateX(100px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero__torii,
+    .torii-glow,
+    .petal {
+      animation: none;
+    }
+    
+    .hero__torii {
+      transform: translateX(-50%);
+    }
+    
+    .petal {
+      display: none;
+    }
   }
 
   .hero__content {
@@ -410,6 +598,23 @@ const sortedCategories = Object.entries(categoryCounts).sort((a, b) => b[1] - a[
     text-align: center;
     font-size: var(--text-xl);
     margin-top: var(--space-10);
+  }
+
+  /* Story graphics */
+  .story__graphic {
+    margin-block: var(--space-10);
+    animation: fade-in-up 0.8s var(--ease-out-expo) forwards;
+  }
+
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   /* Story Sidebar */

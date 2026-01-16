@@ -1,0 +1,475 @@
+---
+/**
+ * WelcomeGraphic.astro
+ * An animated panoramic illustration of Neko-kuni
+ * Shows stylized landscape with five provinces, traditional architecture,
+ * and tiny cat silhouettes going about their lives
+ */
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<div class:list={["welcome-graphic", className]} aria-hidden="true">
+  <svg viewBox="0 0 800 320" class="welcome-graphic__svg" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <!-- Gradients -->
+      <linearGradient id="skyGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="var(--color-accent-tertiary)" stop-opacity="0.15" />
+        <stop offset="50%" stop-color="var(--color-accent-primary)" stop-opacity="0.08" />
+        <stop offset="100%" stop-color="var(--color-bg-secondary)" stop-opacity="0" />
+      </linearGradient>
+
+      <linearGradient id="mountainGrad1" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="var(--color-accent-tertiary)" stop-opacity="0.4" />
+        <stop offset="100%" stop-color="var(--color-accent-tertiary)" stop-opacity="0.15" />
+      </linearGradient>
+
+      <linearGradient id="mountainGrad2" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="var(--color-accent-secondary)" stop-opacity="0.3" />
+        <stop offset="100%" stop-color="var(--color-accent-secondary)" stop-opacity="0.1" />
+      </linearGradient>
+
+      <linearGradient id="waterGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="var(--color-accent-secondary)" stop-opacity="0.1" />
+        <stop offset="50%" stop-color="var(--color-accent-primary)" stop-opacity="0.2" />
+        <stop offset="100%" stop-color="var(--color-accent-secondary)" stop-opacity="0.1" />
+      </linearGradient>
+
+      <linearGradient id="buildingGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="var(--color-accent-primary)" />
+        <stop offset="100%" stop-color="var(--color-accent-tertiary)" />
+      </linearGradient>
+
+      <linearGradient id="gearTowerGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="var(--color-accent-primary)" stop-opacity="0.9" />
+        <stop offset="100%" stop-color="var(--color-accent-tertiary)" stop-opacity="0.7" />
+      </linearGradient>
+
+      <!-- Glow filter -->
+      <filter id="lanternGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="3" result="glow" />
+        <feMerge>
+          <feMergeNode in="glow" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+
+      <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="2" result="blur" />
+        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+      </filter>
+
+      <!-- Cloud pattern -->
+      <pattern id="cloudPattern" x="0" y="0" width="200" height="100" patternUnits="userSpaceOnUse">
+        <ellipse cx="40" cy="70" rx="35" ry="20" fill="var(--color-text-primary)" opacity="0.03" />
+        <ellipse cx="140" cy="50" rx="45" ry="25" fill="var(--color-text-primary)" opacity="0.025" />
+      </pattern>
+    </defs>
+
+    <!-- Sky background -->
+    <rect width="100%" height="100%" fill="url(#skyGradient)" />
+    <rect width="100%" height="100%" fill="url(#cloudPattern)" class="clouds" />
+
+    <!-- Distant mountains (Yama-takumi - Mountain Forge) -->
+    <g class="mountains mountains--distant">
+      <path d="M0 180 L80 100 L130 140 L200 80 L280 130 L350 70 L420 120 L500 85 L580 140 L650 95 L720 135 L800 90 L800 320 L0 320 Z"
+            fill="url(#mountainGrad1)" />
+    </g>
+
+    <!-- Mid-range mountains with snow caps -->
+    <g class="mountains mountains--mid">
+      <path d="M-50 220 L50 140 L120 180 L200 120 L300 170 L380 130 L480 175 L560 145 L650 185 L750 140 L850 190 L850 320 L-50 320 Z"
+            fill="url(#mountainGrad2)" />
+      <!-- Snow caps -->
+      <path d="M200 120 L220 135 L180 135 Z" fill="var(--color-bg-primary)" opacity="0.5" />
+      <path d="M380 130 L400 148 L360 148 Z" fill="var(--color-bg-primary)" opacity="0.5" />
+      <path d="M560 145 L580 162 L540 162 Z" fill="var(--color-bg-primary)" opacity="0.5" />
+    </g>
+
+    <!-- Forest area (Mori-shizuka - Silent Forest) -->
+    <g class="forest">
+      <!-- Tree silhouettes -->
+      <g fill="var(--color-accent-tertiary)" opacity="0.25">
+        <path d="M30 260 L40 200 L50 260 Z" />
+        <path d="M60 260 L75 190 L90 260 Z" />
+        <path d="M100 260 L115 205 L130 260 Z" />
+        <path d="M140 260 L150 215 L160 260 Z" />
+        <!-- Bamboo grove -->
+        <rect x="680" y="210" width="3" height="60" rx="1" />
+        <rect x="690" y="200" width="3" height="70" rx="1" />
+        <rect x="700" y="215" width="3" height="55" rx="1" />
+        <rect x="710" y="205" width="3" height="65" rx="1" />
+        <rect x="720" y="218" width="3" height="52" rx="1" />
+        <rect x="730" y="195" width="3" height="75" rx="1" />
+        <rect x="740" y="210" width="3" height="60" rx="1" />
+        <rect x="750" y="200" width="3" height="70" rx="1" />
+      </g>
+    </g>
+
+    <!-- River (Kawa-no-kuni - River Country) -->
+    <g class="river">
+      <path d="M-20 280 Q100 260 200 280 Q350 300 450 275 Q580 250 700 270 Q780 285 820 275"
+            stroke="url(#waterGradient)" stroke-width="25" fill="none" stroke-linecap="round" class="river-flow" />
+      <path d="M-20 280 Q100 260 200 280 Q350 300 450 275 Q580 250 700 270 Q780 285 820 275"
+            stroke="var(--color-accent-secondary)" stroke-width="1" fill="none" stroke-linecap="round" opacity="0.3" />
+    </g>
+
+    <!-- Bridge -->
+    <g class="bridge" transform="translate(320, 255)">
+      <path d="M0 15 Q40 -5 80 15" stroke="var(--color-accent-primary)" stroke-width="3" fill="none" />
+      <line x1="10" y1="15" x2="10" y2="25" stroke="var(--color-accent-primary)" stroke-width="2" />
+      <line x1="70" y1="15" x2="70" y2="25" stroke="var(--color-accent-primary)" stroke-width="2" />
+    </g>
+
+    <!-- Main Torii Gate (Higashi-hama - East Shore) -->
+    <g class="torii-gate" transform="translate(400, 160)">
+      <defs>
+        <linearGradient id="toriiMainGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="var(--color-accent-primary)" />
+          <stop offset="100%" stop-color="var(--color-accent-tertiary)" />
+        </linearGradient>
+      </defs>
+      <!-- Top beam (kasagi) -->
+      <path d="M-45 0 Q0 -8 45 0 L42 6 Q0 -2 -42 6 Z" fill="url(#toriiMainGrad)" />
+      <!-- Second beam (nuki) -->
+      <rect x="-35" y="14" width="70" height="6" rx="1" fill="url(#toriiMainGrad)" />
+      <!-- Pillars -->
+      <rect x="-32" y="14" width="7" height="65" fill="url(#toriiMainGrad)" />
+      <rect x="25" y="14" width="7" height="65" fill="url(#toriiMainGrad)" />
+      <!-- Mystical glow -->
+      <ellipse cx="0" cy="50" rx="30" ry="25" fill="var(--color-accent-primary)" opacity="0.15" class="torii-glow" filter="url(#softGlow)" />
+    </g>
+
+    <!-- Gear Tower (Yama-takumi technology) -->
+    <g class="gear-tower" transform="translate(580, 170)">
+      <!-- Tower structure -->
+      <rect x="-12" y="20" width="24" height="70" fill="url(#gearTowerGrad)" />
+      <rect x="-16" y="15" width="32" height="8" rx="2" fill="var(--color-accent-primary)" />
+      <rect x="-14" y="85" width="28" height="6" fill="var(--color-accent-tertiary)" />
+
+      <!-- Pagoda-style roof -->
+      <path d="M-25 15 L0 -5 L25 15 Z" fill="var(--color-accent-tertiary)" />
+      <path d="M-20 15 L0 0 L20 15 Z" fill="var(--color-accent-primary)" opacity="0.8" />
+
+      <!-- Animated gears -->
+      <g class="tower-gear tower-gear--1" transform="translate(0, 40)">
+        <circle cx="0" cy="0" r="12" fill="none" stroke="var(--color-accent-secondary)" stroke-width="2" opacity="0.8" />
+        <circle cx="0" cy="0" r="4" fill="var(--color-accent-secondary)" opacity="0.8" />
+        <g stroke="var(--color-accent-secondary)" stroke-width="2" opacity="0.8">
+          <line x1="0" y1="-12" x2="0" y2="-8" />
+          <line x1="0" y1="8" x2="0" y2="12" />
+          <line x1="-12" y1="0" x2="-8" y2="0" />
+          <line x1="8" y1="0" x2="12" y2="0" />
+          <line x1="-8.5" y1="-8.5" x2="-5.6" y2="-5.6" />
+          <line x1="5.6" y1="5.6" x2="8.5" y2="8.5" />
+          <line x1="-8.5" y1="8.5" x2="-5.6" y2="5.6" />
+          <line x1="5.6" y1="-5.6" x2="8.5" y2="-8.5" />
+        </g>
+      </g>
+
+      <g class="tower-gear tower-gear--2" transform="translate(-18, 55)">
+        <circle cx="0" cy="0" r="8" fill="none" stroke="var(--color-accent-primary)" stroke-width="1.5" opacity="0.7" />
+        <circle cx="0" cy="0" r="2.5" fill="var(--color-accent-primary)" opacity="0.7" />
+        <g stroke="var(--color-accent-primary)" stroke-width="1.5" opacity="0.7">
+          <line x1="0" y1="-8" x2="0" y2="-5" />
+          <line x1="0" y1="5" x2="0" y2="8" />
+          <line x1="-8" y1="0" x2="-5" y2="0" />
+          <line x1="5" y1="0" x2="8" y2="0" />
+        </g>
+      </g>
+
+      <!-- Steam/smoke -->
+      <g class="steam">
+        <circle cx="5" cy="-10" r="3" fill="var(--color-text-primary)" opacity="0.08" class="steam-puff steam-puff--1" />
+        <circle cx="8" cy="-18" r="4" fill="var(--color-text-primary)" opacity="0.06" class="steam-puff steam-puff--2" />
+        <circle cx="3" cy="-28" r="5" fill="var(--color-text-primary)" opacity="0.04" class="steam-puff steam-puff--3" />
+      </g>
+    </g>
+
+    <!-- Second smaller gear tower -->
+    <g class="gear-tower gear-tower--small" transform="translate(180, 200)">
+      <rect x="-8" y="15" width="16" height="50" fill="url(#gearTowerGrad)" opacity="0.8" />
+      <path d="M-15 15 L0 0 L15 15 Z" fill="var(--color-accent-tertiary)" opacity="0.8" />
+
+      <g class="tower-gear tower-gear--3" transform="translate(0, 35)">
+        <circle cx="0" cy="0" r="10" fill="none" stroke="var(--color-accent-secondary)" stroke-width="1.5" opacity="0.6" />
+        <circle cx="0" cy="0" r="3" fill="var(--color-accent-secondary)" opacity="0.6" />
+        <g stroke="var(--color-accent-secondary)" stroke-width="1.5" opacity="0.6">
+          <line x1="0" y1="-10" x2="0" y2="-6" />
+          <line x1="0" y1="6" x2="0" y2="10" />
+          <line x1="-10" y1="0" x2="-6" y2="0" />
+          <line x1="6" y1="0" x2="10" y2="0" />
+        </g>
+      </g>
+    </g>
+
+    <!-- Traditional buildings (Minato-kassei - Thriving Port) -->
+    <g class="buildings" transform="translate(650, 220)">
+      <!-- Machiya townhouse -->
+      <rect x="0" y="20" width="25" height="35" fill="var(--color-accent-tertiary)" opacity="0.5" />
+      <path d="M-5 20 L12.5 5 L30 20 Z" fill="var(--color-accent-primary)" opacity="0.6" />
+
+      <!-- Warehouse -->
+      <rect x="35" y="25" width="30" height="30" fill="var(--color-accent-tertiary)" opacity="0.4" />
+      <path d="M30 25 L50 10 L70 25 Z" fill="var(--color-accent-primary)" opacity="0.5" />
+
+      <!-- Paper lanterns -->
+      <g class="lanterns" filter="url(#lanternGlow)">
+        <ellipse cx="12" cy="18" rx="3" ry="4" fill="var(--color-accent-highlight)" class="lantern lantern--1" />
+        <ellipse cx="50" cy="23" rx="3" ry="4" fill="var(--color-accent-highlight)" class="lantern lantern--2" />
+      </g>
+    </g>
+
+    <!-- Cat silhouettes -->
+    <g class="cats" fill="var(--color-accent-tertiary)">
+      <!-- Walking cat on bridge -->
+      <g class="cat cat--walking" transform="translate(350, 248)">
+        <ellipse cx="0" cy="0" rx="5" ry="3" /> <!-- body -->
+        <circle cx="-5" cy="-2" r="2.5" /> <!-- head -->
+        <path d="M-7 -4 L-6 -7 L-5 -4" /> <!-- ear 1 -->
+        <path d="M-4 -4 L-5 -7 L-6 -4" /> <!-- ear 2 -->
+        <path d="M4 0 Q8 -2 10 2" stroke="var(--color-accent-tertiary)" stroke-width="1" fill="none" /> <!-- tail -->
+      </g>
+
+      <!-- Cat near torii -->
+      <g class="cat cat--sitting" transform="translate(420, 225)">
+        <ellipse cx="0" cy="2" rx="4" ry="3" /> <!-- body -->
+        <circle cx="0" cy="-3" r="3" /> <!-- head -->
+        <path d="M-3 -6 L-2 -9 L0 -6" /> <!-- ear 1 -->
+        <path d="M0 -6 L2 -9 L3 -6" /> <!-- ear 2 -->
+        <path d="M4 4 Q7 6 6 9" stroke="var(--color-accent-tertiary)" stroke-width="1" fill="none" /> <!-- tail -->
+      </g>
+
+      <!-- Cat by gear tower -->
+      <g class="cat cat--looking-up" transform="translate(560, 250)">
+        <ellipse cx="0" cy="0" rx="4" ry="2.5" /> <!-- body -->
+        <circle cx="-3" cy="-3" r="2.5" /> <!-- head looking up -->
+        <path d="M-5 -5 L-4 -8 L-3 -5" /> <!-- ear 1 -->
+        <path d="M-3 -5 L-2 -8 L-1 -5" /> <!-- ear 2 -->
+      </g>
+
+      <!-- Cat family in distance -->
+      <g opacity="0.4" transform="translate(250, 265)">
+        <ellipse cx="0" cy="0" rx="3" ry="2" />
+        <circle cx="-2" cy="-1.5" r="1.5" />
+        <ellipse cx="8" cy="0" rx="2" ry="1.5" />
+        <circle cx="6.5" cy="-1" r="1.2" />
+      </g>
+    </g>
+
+    <!-- Foreground grass/path -->
+    <g class="foreground">
+      <path d="M0 290 Q200 280 400 290 Q600 300 800 285 L800 320 L0 320 Z"
+            fill="var(--color-accent-tertiary)" opacity="0.08" />
+    </g>
+
+    <!-- Floating cherry blossoms -->
+    <g class="sakura">
+      <circle cx="100" cy="120" r="2" fill="var(--color-accent-highlight)" opacity="0.4" class="petal petal--1" />
+      <circle cx="250" cy="90" r="1.5" fill="var(--color-accent-highlight)" opacity="0.3" class="petal petal--2" />
+      <circle cx="500" cy="100" r="2" fill="var(--color-accent-highlight)" opacity="0.35" class="petal petal--3" />
+      <circle cx="680" cy="130" r="1.5" fill="var(--color-accent-highlight)" opacity="0.3" class="petal petal--4" />
+      <circle cx="150" cy="180" r="1.8" fill="var(--color-accent-highlight)" opacity="0.25" class="petal petal--5" />
+      <circle cx="720" cy="160" r="2" fill="var(--color-accent-highlight)" opacity="0.4" class="petal petal--6" />
+    </g>
+
+    <!-- Province labels (subtle) -->
+    <g class="labels" fill="var(--color-text-tertiary)" font-family="var(--font-heading)" font-size="7" opacity="0.4">
+      <text x="420" y="245" text-anchor="middle">Higashi-hama</text>
+      <text x="580" y="255" text-anchor="middle">Yama-takumi</text>
+      <text x="100" y="250" text-anchor="middle">Mori-shizuka</text>
+    </g>
+  </svg>
+</div>
+
+<style>
+  .welcome-graphic {
+    width: 100%;
+    max-width: 900px;
+    margin-inline: auto;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    background: linear-gradient(180deg,
+      var(--color-bg-secondary) 0%,
+      var(--color-bg-tertiary) 100%
+    );
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--color-border);
+  }
+
+  .welcome-graphic__svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    min-height: 180px;
+  }
+
+  /* Clouds animation */
+  .clouds {
+    animation: clouds-drift 60s linear infinite;
+  }
+
+  @keyframes clouds-drift {
+    from { transform: translateX(0); }
+    to { transform: translateX(-200px); }
+  }
+
+  /* River shimmer */
+  .river-flow {
+    animation: river-shimmer 4s ease-in-out infinite;
+  }
+
+  @keyframes river-shimmer {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  /* Torii gate glow pulse */
+  .torii-glow {
+    animation: glow-pulse 4s ease-in-out infinite;
+  }
+
+  @keyframes glow-pulse {
+    0%, 100% {
+      opacity: 0.15;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.25;
+      transform: scale(1.1);
+    }
+  }
+
+  /* Gear rotations */
+  .tower-gear--1 {
+    animation: gear-rotate 15s linear infinite;
+    transform-origin: center;
+  }
+
+  .tower-gear--2 {
+    animation: gear-rotate 12s linear infinite reverse;
+    transform-origin: center;
+  }
+
+  .tower-gear--3 {
+    animation: gear-rotate 18s linear infinite;
+    transform-origin: center;
+  }
+
+  @keyframes gear-rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* Gear tower hover effect */
+  .gear-tower {
+    transition: transform 0.5s var(--ease-out-expo);
+  }
+
+  .welcome-graphic:hover .gear-tower {
+    transform: translateY(-2px);
+  }
+
+  .welcome-graphic:hover .tower-gear--1 {
+    animation-duration: 8s;
+  }
+
+  .welcome-graphic:hover .tower-gear--2 {
+    animation-duration: 6s;
+  }
+
+  /* Steam animation */
+  .steam-puff {
+    animation: steam-rise 4s ease-out infinite;
+  }
+
+  .steam-puff--1 { animation-delay: 0s; }
+  .steam-puff--2 { animation-delay: 1.3s; }
+  .steam-puff--3 { animation-delay: 2.6s; }
+
+  @keyframes steam-rise {
+    0% {
+      opacity: 0.08;
+      transform: translateY(0) scale(1);
+    }
+    50% {
+      opacity: 0.04;
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-20px) scale(1.5);
+    }
+  }
+
+  /* Lantern glow */
+  .lantern {
+    animation: lantern-flicker 3s ease-in-out infinite;
+  }
+
+  .lantern--1 { animation-delay: 0s; }
+  .lantern--2 { animation-delay: 1.5s; }
+
+  @keyframes lantern-flicker {
+    0%, 100% { opacity: 0.7; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.1); }
+  }
+
+  /* Cherry blossom petals */
+  .petal {
+    animation: petal-float 20s ease-in-out infinite;
+  }
+
+  .petal--1 { animation-delay: 0s; animation-duration: 18s; }
+  .petal--2 { animation-delay: -3s; animation-duration: 22s; }
+  .petal--3 { animation-delay: -6s; animation-duration: 20s; }
+  .petal--4 { animation-delay: -9s; animation-duration: 24s; }
+  .petal--5 { animation-delay: -12s; animation-duration: 19s; }
+  .petal--6 { animation-delay: -15s; animation-duration: 21s; }
+
+  @keyframes petal-float {
+    0% {
+      transform: translate(0, 0) rotate(0deg);
+      opacity: 0;
+    }
+    10% {
+      opacity: 0.4;
+    }
+    90% {
+      opacity: 0.4;
+    }
+    100% {
+      transform: translate(50px, 150px) rotate(360deg);
+      opacity: 0;
+    }
+  }
+
+  /* Cat walking animation */
+  .cat--walking {
+    animation: cat-walk 8s ease-in-out infinite;
+  }
+
+  @keyframes cat-walk {
+    0%, 100% { transform: translate(350px, 248px); }
+    50% { transform: translate(380px, 248px); }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .clouds,
+    .river-flow,
+    .torii-glow,
+    .tower-gear--1,
+    .tower-gear--2,
+    .tower-gear--3,
+    .steam-puff,
+    .lantern,
+    .petal,
+    .cat--walking {
+      animation: none;
+    }
+  }
+</style>
