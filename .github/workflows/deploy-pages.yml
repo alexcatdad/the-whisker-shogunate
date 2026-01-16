@@ -32,7 +32,9 @@ jobs:
           bun-version: latest
 
       - name: Install dependencies
-        run: bun install
+        run: |
+          bun install
+          cd lore-server && bun install
 
       - name: Export lore from database
         run: bun run scripts/export-lore.ts
