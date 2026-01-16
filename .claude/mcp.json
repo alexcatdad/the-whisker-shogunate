@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "whisker-lore": {
+      "command": "node",
+      "args": ["dist/index.js"],
+      "cwd": "./lore-server"
+    }
+  }
+}

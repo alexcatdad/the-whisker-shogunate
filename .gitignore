@@ -11,5 +11,13 @@ Thumbs.db
 *.swo
 *~
 
-# Claude Code
-.claude/
+# Claude Code (keep mcp.json for project MCP servers)
+.claude/*
+!.claude/mcp.json
+
+# Node
+node_modules/
+dist/
+
+# LanceDB data (binary, can be rebuilt from exports)
+lore-server/data/lore.lance/
