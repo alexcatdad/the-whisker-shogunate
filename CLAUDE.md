@@ -84,7 +84,44 @@ Located in `/originals/`:
 - `whisker-shogunate-part3.md` - Society, culture, professions, language, guilds
 - `whisker-shogunate-part4.md` - Cuisine, history, current events, mysteries
 
-**When generating content**: Always reference these files for consistency. The world has specific rules:
+## Lore Server (MCP)
+
+The project includes a local MCP server for semantic search and management of all lore. The database is the source of truth - markdown files are for import/export only.
+
+**Prerequisites**: Ollama running locally with `nomic-embed-text` model.
+
+### Available Tools
+
+| Tool | Purpose |
+|------|---------|
+| `search_lore(query, category?, limit?)` | Semantic search across all 181 lore entries |
+| `get_entry(id)` | Fetch a single entry by ID |
+| `list_entries(category?)` | Browse entries, optionally by category |
+| `list_categories()` | List all available categories |
+| `create_entry(title, content, category, tags?, metadata?)` | Add new lore |
+| `update_entry(id, ...)` | Edit existing lore |
+| `delete_entry(id)` | Remove lore |
+| `export_markdown(category?)` | Export to markdown for sharing |
+
+### Categories
+
+architecture, characters, cuisine, culture, factions, flora, general, history, locations, politics, professions, society, technology, world
+
+### Workflow
+
+1. **Search first**: Use `search_lore` to find relevant existing content before creating new entries
+2. **Stay consistent**: Reference existing entries when adding related content
+3. **Use tags**: Add meaningful tags for cross-referencing
+4. **Export periodically**: Use `export_markdown` to create shareable snapshots
+
+### Technical Details
+
+- **Location**: `lore-server/`
+- **Database**: LanceDB (embedded, stored in `lore-server/data/lore.lance/`)
+- **Embeddings**: Ollama `nomic-embed-text` (local, no API costs)
+- **Config**: `.claude/mcp.json`
+
+**When generating content**: Use the lore server tools for consistency. The world has specific rules:
 
 - No mammal meat (strong cultural taboo)
 - No toxic foods (grapes, onions, chocolate don't exist)
