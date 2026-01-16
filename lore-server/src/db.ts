@@ -1,7 +1,7 @@
 import * as lancedb from "@lancedb/lancedb";
 import { v4 as uuidv4 } from "uuid";
 import { embed } from "./embeddings.js";
-import { log } from "./logger.js";
+import { log, createTimer } from "./logger.js";
 import type {
   LoreEntry,
   LoreEntryWithVector,
@@ -10,19 +10,80 @@ import type {
   SearchResult,
 } from "./types.js";
 
-const DB_PATH = process.env.LORE_DB_PATH || "./data/lore_db";
+export const DB_PATH = process.env.LORE_DB_PATH || "./data/lore_db";
+const MAX_RECONNECT_ATTEMPTS = 2;
 
 let db: lancedb.Connection | null = null;
 let table: lancedb.Table | null = null;
 
-export async function connect(): Promise<void> {
-  db = await lancedb.connect(DB_PATH);
-  log.connect(DB_PATH);
+class DbError extends Error {
+  constructor(
+    message: string,
+    public readonly operation: string,
+    public readonly recoverable: boolean = false
+  ) {
+    super(message);
+    this.name = "DbError";
+  }
+}
 
-  // Check if table exists
-  const tables = await db.tableNames();
-  if (tables.includes("lore")) {
-    table = await db.openTable("lore");
+async function withRetry<T>(
+  operation: string,
+  fn: () => Promise<T>,
+  maxAttempts: number = MAX_RECONNECT_ATTEMPTS
+): Promise<T> {
+  let lastError: Error | null = null;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+
+      // Check if this looks like a connection issue
+      const isConnectionError =
+        lastError.message.includes("connection") ||
+        lastError.message.includes("ENOENT") ||
+        lastError.message.includes("closed") ||
+        lastError.message.includes("not open");
+
+      if (isConnectionError && attempt < maxAttempts) {
+        log.dbReconnect(attempt, lastError.message);
+        // Reset connection state and retry
+        db = null;
+        table = null;
+        await connect();
+        continue;
+      }
+
+      break;
+    }
+  }
+
+  log.dbOperationError(operation, lastError?.message || "Unknown error");
+  throw new DbError(
+    `${operation} failed: ${lastError?.message}`,
+    operation,
+    false
+  );
+}
+
+export async function connect(): Promise<void> {
+  const timer = createTimer();
+
+  try {
+    db = await lancedb.connect(DB_PATH);
+    log.connect(DB_PATH);
+
+    // Check if table exists
+    const tables = await db.tableNames();
+    if (tables.includes("lore")) {
+      table = await db.openTable("lore");
+    }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    log.dbOperationError("CONNECT", message);
+    throw new DbError(`Failed to connect to database: ${message}`, "CONNECT", true);
   }
 }
 
@@ -67,181 +128,220 @@ export async function searchLore(
   category?: string,
   limit: number = 10
 ): Promise<SearchResult[]> {
-  const tbl = await ensureTable();
-  const queryVector = await embed(query);
+  return withRetry("SEARCH", async () => {
+    const tbl = await ensureTable();
+    const queryVector = await embed(query);
 
-  let search = tbl.search(queryVector).limit(limit);
+    let search = tbl.search(queryVector).limit(limit);
 
-  if (category) {
-    search = search.where(`category = '${category}'`);
-  }
+    if (category) {
+      search = search.where(`category = '${category}'`);
+    }
 
-  const results = await search.toArray();
-  log.search(query, category, limit, results.length);
+    const results = await search.toArray();
+    log.search(query, category, limit, results.length);
 
-  return results.map((row) => ({
-    entry: rowToEntry(row),
-    score: row._distance ?? 0,
-  }));
+    return results.map((row) => ({
+      entry: rowToEntry(row),
+      score: row._distance ?? 0,
+    }));
+  });
 }
 
 export async function getEntry(id: string): Promise<LoreEntry | null> {
-  const tbl = await ensureTable();
-  const results = await tbl.query().where(`id = '${id}'`).limit(1).toArray();
+  return withRetry("GET_ENTRY", async () => {
+    const tbl = await ensureTable();
+    const results = await tbl.query().where(`id = '${id}'`).limit(1).toArray();
 
-  if (results.length === 0) {
-    log.getEntry(id, false);
-    return null;
-  }
+    if (results.length === 0) {
+      log.getEntry(id, false);
+      return null;
+    }
 
-  log.getEntry(id, true);
-  return rowToEntry(results[0]);
+    log.getEntry(id, true);
+    return rowToEntry(results[0]);
+  });
 }
 
 export async function listEntries(category?: string): Promise<LoreEntry[]> {
-  const tbl = await ensureTable();
+  return withRetry("LIST_ENTRIES", async () => {
+    const tbl = await ensureTable();
 
-  let query = tbl.query();
-  if (category) {
-    query = query.where(`category = '${category}'`);
-  }
+    let query = tbl.query();
+    if (category) {
+      query = query.where(`category = '${category}'`);
+    }
 
-  const results = await query.toArray();
-  log.listEntries(category, results.length);
-  return results.map(rowToEntry);
+    const results = await query.toArray();
+    log.listEntries(category, results.length);
+    return results.map(rowToEntry);
+  });
 }
 
 export async function createEntry(input: CreateEntryInput): Promise<LoreEntry> {
-  const tbl = await ensureTable();
+  return withRetry("CREATE_ENTRY", async () => {
+    const tbl = await ensureTable();
 
-  const now = new Date().toISOString();
-  const id = uuidv4();
+    const now = new Date().toISOString();
+    const id = uuidv4();
 
-  // Embed title + content together for better semantic matching
-  const textToEmbed = `${input.title}\n\n${input.content}`;
-  const vector = await embed(textToEmbed);
+    // Embed title + content together for better semantic matching
+    const textToEmbed = `${input.title}\n\n${input.content}`;
+    const vector = await embed(textToEmbed);
 
-  const entry = {
-    id,
-    title: input.title,
-    content: input.content,
-    category: input.category,
-    tags: input.tags?.length ? input.tags : ["untagged"],
-    parentId: input.parentId || "",
-    metadata: JSON.stringify(input.metadata || {}),
-    createdAt: now,
-    updatedAt: now,
-    vector,
-  };
+    const entry = {
+      id,
+      title: input.title,
+      content: input.content,
+      category: input.category,
+      tags: input.tags?.length ? input.tags : ["untagged"],
+      parentId: input.parentId || "",
+      metadata: JSON.stringify(input.metadata || {}),
+      createdAt: now,
+      updatedAt: now,
+      vector,
+    };
 
-  await tbl.add([entry as unknown as Record<string, unknown>]);
-  log.createEntry(id, input.title, input.category);
+    await tbl.add([entry as unknown as Record<string, unknown>]);
+    log.createEntry(id, input.title, input.category);
 
-  return rowToEntry(entry as unknown as Record<string, unknown>);
+    return rowToEntry(entry as unknown as Record<string, unknown>);
+  });
 }
 
 export async function updateEntry(
   id: string,
   input: UpdateEntryInput
 ): Promise<LoreEntry | null> {
-  const existing = await getEntry(id);
-  if (!existing) {
-    return null;
-  }
+  return withRetry("UPDATE_ENTRY", async () => {
+    const existing = await getEntry(id);
+    if (!existing) {
+      return null;
+    }
 
-  const tbl = await ensureTable();
-  const now = new Date().toISOString();
+    const tbl = await ensureTable();
+    const now = new Date().toISOString();
 
-  const updated: LoreEntry = {
-    ...existing,
-    ...input,
-    updatedAt: now,
-  };
+    const updated: LoreEntry = {
+      ...existing,
+      ...input,
+      updatedAt: now,
+    };
 
-  // Re-embed if title or content changed
-  let vector: number[];
-  if (input.title || input.content) {
-    const textToEmbed = `${updated.title}\n\n${updated.content}`;
-    vector = await embed(textToEmbed);
-  } else {
-    // Fetch existing vector
-    const rows = await tbl.query().where(`id = '${id}'`).limit(1).toArray();
-    vector = rows[0].vector as number[];
-  }
+    // Re-embed if title or content changed
+    let vector: number[];
+    if (input.title || input.content) {
+      const textToEmbed = `${updated.title}\n\n${updated.content}`;
+      vector = await embed(textToEmbed);
+    } else {
+      // Fetch existing vector
+      const rows = await tbl.query().where(`id = '${id}'`).limit(1).toArray();
+      vector = rows[0].vector as number[];
+    }
 
-  // Delete old, insert new (LanceDB update pattern)
-  await tbl.delete(`id = '${id}'`);
+    // Delete old, insert new (LanceDB update pattern)
+    await tbl.delete(`id = '${id}'`);
 
-  const row = {
-    ...updated,
-    tags: updated.tags?.length ? updated.tags : ["untagged"],
-    metadata: JSON.stringify(updated.metadata || {}),
-    vector,
-  };
-  await tbl.add([row as unknown as Record<string, unknown>]);
+    const row = {
+      ...updated,
+      tags: updated.tags?.length ? updated.tags : ["untagged"],
+      metadata: JSON.stringify(updated.metadata || {}),
+      vector,
+    };
+    await tbl.add([row as unknown as Record<string, unknown>]);
 
-  const fieldsUpdated = Object.keys(input).filter(k => input[k as keyof UpdateEntryInput] !== undefined);
-  log.updateEntry(id, updated.title, fieldsUpdated);
+    const fieldsUpdated = Object.keys(input).filter(
+      (k) => input[k as keyof UpdateEntryInput] !== undefined
+    );
+    log.updateEntry(id, updated.title, fieldsUpdated);
 
-  return updated;
+    return updated;
+  });
 }
 
 export async function deleteEntry(id: string): Promise<boolean> {
-  const tbl = await ensureTable();
-  const existing = await getEntry(id);
+  return withRetry("DELETE_ENTRY", async () => {
+    const tbl = await ensureTable();
+    const existing = await getEntry(id);
 
-  if (!existing) {
-    return false;
-  }
+    if (!existing) {
+      return false;
+    }
 
-  await tbl.delete(`id = '${id}'`);
-  log.deleteEntry(id, existing.title);
-  return true;
+    await tbl.delete(`id = '${id}'`);
+    log.deleteEntry(id, existing.title);
+    return true;
+  });
 }
 
 export async function bulkInsert(entries: CreateEntryInput[]): Promise<number> {
-  const tbl = await ensureTable();
-  const now = new Date().toISOString();
+  return withRetry("BULK_INSERT", async () => {
+    const tbl = await ensureTable();
+    const now = new Date().toISOString();
 
-  // Batch embed all entries
-  const textsToEmbed = entries.map((e) => `${e.title}\n\n${e.content}`);
-  const vectors = await Promise.all(textsToEmbed.map((t) => embed(t)));
+    // Batch embed all entries
+    const textsToEmbed = entries.map((e) => `${e.title}\n\n${e.content}`);
+    const vectors = await Promise.all(textsToEmbed.map((t) => embed(t)));
 
-  const rows = entries.map((input, i) => ({
-    id: uuidv4(),
-    title: input.title,
-    content: input.content,
-    category: input.category,
-    tags: input.tags?.length ? input.tags : ["untagged"],
-    parentId: input.parentId || "",
-    metadata: JSON.stringify(input.metadata || {}),
-    createdAt: now,
-    updatedAt: now,
-    vector: vectors[i],
-  }));
+    const rows = entries.map((input, i) => ({
+      id: uuidv4(),
+      title: input.title,
+      content: input.content,
+      category: input.category,
+      tags: input.tags?.length ? input.tags : ["untagged"],
+      parentId: input.parentId || "",
+      metadata: JSON.stringify(input.metadata || {}),
+      createdAt: now,
+      updatedAt: now,
+      vector: vectors[i],
+    }));
 
-  await tbl.add(rows as unknown as Record<string, unknown>[]);
+    await tbl.add(rows as unknown as Record<string, unknown>[]);
 
-  const categories = [...new Set(entries.map(e => e.category))];
-  log.bulkInsert(rows.length, categories);
+    const categories = [...new Set(entries.map((e) => e.category))];
+    log.bulkInsert(rows.length, categories);
 
-  return rows.length;
+    return rows.length;
+  });
 }
 
 export async function getCategories(): Promise<string[]> {
-  const tbl = await ensureTable();
-  const results = await tbl.query().select(["category"]).toArray();
+  return withRetry("GET_CATEGORIES", async () => {
+    const tbl = await ensureTable();
+    const results = await tbl.query().select(["category"]).toArray();
 
-  const categories = new Set<string>();
-  for (const row of results) {
-    if (row.category) {
-      categories.add(row.category as string);
+    const categories = new Set<string>();
+    for (const row of results) {
+      if (row.category) {
+        categories.add(row.category as string);
+      }
     }
-  }
 
-  const sorted = Array.from(categories).sort();
-  log.getCategories(sorted);
-  return sorted;
+    const sorted = Array.from(categories).sort();
+    log.getCategories(sorted);
+    return sorted;
+  });
+}
+
+export async function healthCheck(): Promise<{
+  ok: boolean;
+  entryCount?: number;
+  error?: string;
+}> {
+  try {
+    const tbl = await ensureTable();
+    const results = await tbl.query().select(["id"]).toArray();
+    return {
+      ok: true,
+      entryCount: results.length,
+    };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    return {
+      ok: false,
+      error: `Database error: ${message}`,
+    };
+  }
 }
 
 function rowToEntry(row: Record<string, unknown>): LoreEntry {

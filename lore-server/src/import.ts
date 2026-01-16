@@ -1,4 +1,4 @@
-import * as fs from "fs/promises";
+import { readdir } from "node:fs/promises";
 import * as path from "path";
 import * as db from "./db.js";
 import type { CreateEntryInput } from "./types.js";
@@ -180,7 +180,7 @@ function extractTags(content: string, title: string): string[] {
 }
 
 async function importFile(filePath: string): Promise<number> {
-  const content = await fs.readFile(filePath, "utf-8");
+  const content = await Bun.file(filePath).text();
   const fileName = path.basename(filePath);
 
   console.log(`Parsing ${fileName}...`);
@@ -227,7 +227,7 @@ async function main() {
   const originalsPath = path.resolve(process.cwd(), ORIGINALS_DIR);
   console.log(`Reading from: ${originalsPath}\n`);
 
-  const files = await fs.readdir(originalsPath);
+  const files = await readdir(originalsPath);
   const mdFiles = files.filter(
     (f) =>
       f.endsWith(".md") &&
