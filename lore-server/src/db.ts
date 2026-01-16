@@ -1,6 +1,7 @@
 import * as lancedb from "@lancedb/lancedb";
 import { v4 as uuidv4 } from "uuid";
 import { embed } from "./embeddings.js";
+import { log } from "./logger.js";
 import type {
   LoreEntry,
   LoreEntryWithVector,
@@ -16,6 +17,7 @@ let table: lancedb.Table | null = null;
 
 export async function connect(): Promise<void> {
   db = await lancedb.connect(DB_PATH);
+  log.connect(DB_PATH);
 
   // Check if table exists
   const tables = await db.tableNames();
@@ -75,6 +77,7 @@ export async function searchLore(
   }
 
   const results = await search.toArray();
+  log.search(query, category, limit, results.length);
 
   return results.map((row) => ({
     entry: rowToEntry(row),
@@ -87,9 +90,11 @@ export async function getEntry(id: string): Promise<LoreEntry | null> {
   const results = await tbl.query().where(`id = '${id}'`).limit(1).toArray();
 
   if (results.length === 0) {
+    log.getEntry(id, false);
     return null;
   }
 
+  log.getEntry(id, true);
   return rowToEntry(results[0]);
 }
 
@@ -102,6 +107,7 @@ export async function listEntries(category?: string): Promise<LoreEntry[]> {
   }
 
   const results = await query.toArray();
+  log.listEntries(category, results.length);
   return results.map(rowToEntry);
 }
 
@@ -129,6 +135,7 @@ export async function createEntry(input: CreateEntryInput): Promise<LoreEntry> {
   };
 
   await tbl.add([entry as unknown as Record<string, unknown>]);
+  log.createEntry(id, input.title, input.category);
 
   return rowToEntry(entry as unknown as Record<string, unknown>);
 }
@@ -173,6 +180,9 @@ export async function updateEntry(
   };
   await tbl.add([row as unknown as Record<string, unknown>]);
 
+  const fieldsUpdated = Object.keys(input).filter(k => input[k as keyof UpdateEntryInput] !== undefined);
+  log.updateEntry(id, updated.title, fieldsUpdated);
+
   return updated;
 }
 
@@ -185,6 +195,7 @@ export async function deleteEntry(id: string): Promise<boolean> {
   }
 
   await tbl.delete(`id = '${id}'`);
+  log.deleteEntry(id, existing.title);
   return true;
 }
 
@@ -210,6 +221,10 @@ export async function bulkInsert(entries: CreateEntryInput[]): Promise<number> {
   }));
 
   await tbl.add(rows as unknown as Record<string, unknown>[]);
+
+  const categories = [...new Set(entries.map(e => e.category))];
+  log.bulkInsert(rows.length, categories);
+
   return rows.length;
 }
 
@@ -224,7 +239,9 @@ export async function getCategories(): Promise<string[]> {
     }
   }
 
-  return Array.from(categories).sort();
+  const sorted = Array.from(categories).sort();
+  log.getCategories(sorted);
+  return sorted;
 }
 
 function rowToEntry(row: Record<string, unknown>): LoreEntry {
