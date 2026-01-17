@@ -30,6 +30,8 @@ jobs:
           bun-version: latest
 
       - name: Build website
+        env:
+          CONVEX_URL: ${{ secrets.CONVEX_URL }}
         run: |
           cd website
           bun install

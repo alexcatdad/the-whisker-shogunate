@@ -7,6 +7,10 @@
     "start": "bun src/index.ts",
     "dev": "bun --watch src/index.ts",
     "import": "bun src/import.ts",
+    "generate-flora": "bun src/flora-generator/index.ts",
+    "generate-flora:resume": "bun src/flora-generator/index.ts --resume",
+    "generate-flora:test": "bun src/flora-generator/index.ts --test",
+    "generate-flora:clear": "bun src/flora-generator/index.ts --clear",
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
@@ -14,9 +18,8 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
-    "@lancedb/lancedb": "^0.23.0",
     "@modelcontextprotocol/sdk": "^1.25.2",
-    "apache-arrow": "^21.1.0",
+    "convex": "^1.21.0",
     "uuid": "^13.0.0"
   },
   "devDependencies": {

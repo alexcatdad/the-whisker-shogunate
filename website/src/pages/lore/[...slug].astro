@@ -1,22 +1,20 @@
 ---
-import { getCollection, render } from "astro:content";
+import { getCollection } from "astro:content";
+import { marked } from "marked";
 import LoreEntry from "../../layouts/LoreEntry.astro";
 
-export async function getStaticPaths() {
-  const allLore = await getCollection("lore");
+const { slug } = Astro.params;
 
-  return allLore.map((entry) => ({
-    params: { slug: entry.id.replace(/\.md$/, "") },
-    props: { entry },
-  }));
+// Find the entry by slug
+const allLore = await getCollection("lore");
+const entry = allLore.find((e) => e.id.replace(/\.md$/, "") === slug);
+
+if (!entry) {
+  return Astro.redirect(`${import.meta.env.BASE_URL}404`);
 }
 
-interface Props {
-  entry: Awaited<ReturnType<typeof getCollection<"lore">>>[number];
-}
-
-const { entry } = Astro.props;
-const { Content } = await render(entry);
+// Parse markdown to HTML
+const content = await marked.parse(entry.body || "");
 ---
 
 <LoreEntry
@@ -25,5 +23,5 @@ const { Content } = await render(entry);
   tags={entry.data.tags}
   updatedAt={entry.data.updatedAt}
 >
-  <Content />
+  <article class="prose" set:html={content} />
 </LoreEntry>

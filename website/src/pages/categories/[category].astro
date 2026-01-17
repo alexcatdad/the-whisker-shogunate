@@ -4,48 +4,47 @@ import Base from "../../layouts/Base.astro";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import EntryCard from "../../components/EntryCard.astro";
 
-export async function getStaticPaths() {
-  const allLore = await getCollection("lore");
-  const categories = [...new Set(allLore.map((entry) => entry.data.category))];
-
-  return categories.map((category) => ({
-    params: { category },
-    props: {
-      entries: allLore
-        .filter((entry) => entry.data.category === category)
-        .sort((a, b) => a.data.title.localeCompare(b.data.title)),
-    },
-  }));
-}
-
-interface Props {
-  entries: Awaited<ReturnType<typeof getCollection<"lore">>>;
-}
-
 const { category } = Astro.params;
-const { entries } = Astro.props;
+const url = new URL(Astro.request.url);
+const page = parseInt(url.searchParams.get("page") || "1");
+const search = url.searchParams.get("search") || "";
+const ITEMS_PER_PAGE = 50;
+
+// Get all entries for this category
+const allLore = await getCollection("lore");
+let categoryEntries = allLore
+  .filter((entry) => entry.data.category === category)
+  .sort((a, b) => a.data.title.localeCompare(b.data.title));
+
+// Apply search filter if provided
+if (search) {
+  const searchLower = search.toLowerCase();
+  categoryEntries = categoryEntries.filter(
+    (entry) =>
+      entry.data.title.toLowerCase().includes(searchLower) ||
+      entry.data.tags?.some((tag: string) => tag.toLowerCase().includes(searchLower))
+  );
+}
+
+// Paginate
+const totalEntries = categoryEntries.length;
+const totalPages = Math.ceil(totalEntries / ITEMS_PER_PAGE);
+const startIndex = (page - 1) * ITEMS_PER_PAGE;
+const entries = categoryEntries.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
 function getExcerpt(content: string, maxLength = 150): string {
   const text = content
-    // Remove headings
     .replace(/^#{1,6}\s+.*$/gm, "")
-    // Remove bold/italic markers
     .replace(/\*\*([^*]+)\*\*/g, "$1")
     .replace(/\*([^*]+)\*/g, "$1")
     .replace(/__([^_]+)__/g, "$1")
     .replace(/_([^_]+)_/g, "$1")
-    // Remove links but keep text
     .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
-    // Remove images
     .replace(/!\[([^\]]*)\]\([^)]+\)/g, "")
-    // Remove inline code
     .replace(/`([^`]+)`/g, "$1")
-    // Remove horizontal rules
     .replace(/^[-*_]{3,}$/gm, "")
-    // Remove list markers
     .replace(/^[\s]*[-*+]\s+/gm, "")
     .replace(/^[\s]*\d+\.\s+/gm, "")
-    // Collapse multiple newlines/spaces
     .replace(/\n+/g, " ")
     .replace(/\s+/g, " ")
     .trim();
@@ -55,12 +54,9 @@ function getExcerpt(content: string, maxLength = 150): string {
 }
 
 const categoryDescriptions: Record<string, string> = {
-  architecture:
-    "Explore the buildings, structures, and architectural styles that define the physical landscape of Neko-kuni.",
-  characters:
-    "Meet the notable figures and personalities who shape the world of the Whisker Shogunate.",
-  cuisine:
-    "Discover the rich food culture, dining customs, and culinary traditions of cat society.",
+  architecture: "Explore the buildings, structures, and architectural styles that define the physical landscape of Neko-kuni.",
+  characters: "Meet the notable figures and personalities who shape the world of the Whisker Shogunate.",
+  cuisine: "Discover the rich food culture, dining customs, and culinary traditions of cat society.",
   culture: "Learn about the arts, customs, and cultural practices that make Neko-kuni unique.",
   factions: "Understand the organizations, guilds, and political groups vying for influence.",
   flora: "Explore the plants, gardens, and botanical knowledge of the realm.",
@@ -73,6 +69,24 @@ const categoryDescriptions: Record<string, string> = {
   technology: "Marvel at the Whisker-Punk inventions and innovations that power civilization.",
   world: "Explore the geography, cosmology, and fundamental mechanics of the realm.",
 };
+
+const baseUrl = `${import.meta.env.BASE_URL}categories/${category}`;
+
+// Calculate page numbers for pagination (avoid complex ternary in template)
+function getPageNumbers(currentPage: number, total: number): number[] {
+  if (total <= 5) {
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+  if (currentPage <= 3) {
+    return [1, 2, 3, 4, 5];
+  }
+  if (currentPage >= total - 2) {
+    return [total - 4, total - 3, total - 2, total - 1, total];
+  }
+  return [currentPage - 2, currentPage - 1, currentPage, currentPage + 1, currentPage + 2];
+}
+
+const pageNumbers = getPageNumbers(page, totalPages);
 ---
 
 <Base
@@ -89,31 +103,80 @@ const categoryDescriptions: Record<string, string> = {
             { label: category! },
           ]}
         />
-        
+
         <div class="page__title-group">
           <h1 class="page__title">{category}</h1>
-          <p class="page__count">{entries.length} {entries.length === 1 ? "entry" : "entries"}</p>
+          <p class="page__count">{totalEntries.toLocaleString()} {totalEntries === 1 ? "entry" : "entries"}</p>
         </div>
-        
+
         <p class="page__description">
           {categoryDescriptions[category!] || `Explore all lore entries in the ${category} category.`}
         </p>
+
+        <!-- Search box -->
+        <form class="search-form" method="get" action={baseUrl}>
+          <input
+            type="search"
+            name="search"
+            placeholder="Search {category}..."
+            value={search}
+            class="search-input"
+          />
+          <button type="submit" class="search-button">Search</button>
+          {search && <a href={baseUrl} class="search-clear">Clear</a>}
+        </form>
       </div>
     </header>
 
     <main class="page__content">
-      <div class="page__grid stagger-children">
-        {entries.map((entry, index) => (
-          <EntryCard
-            title={entry.data.title}
-            category={entry.data.category}
-            slug={entry.id.split("/").pop()!.replace(/\.md$/, "")}
-            excerpt={getExcerpt(entry.body || "")}
-            tags={entry.data.tags}
-            featured={index < 2}
-          />
-        ))}
-      </div>
+      {entries.length === 0 && (
+        <p class="no-results">No entries found{search ? ` for "${search}"` : ""}.</p>
+      )}
+
+      {entries.length > 0 && (
+        <div class="page__grid">
+          {entries.map((entry, index) => (
+            <EntryCard
+              title={entry.data.title}
+              category={entry.data.category}
+              slug={entry.id.split("/").pop()!.replace(/\.md$/, "")}
+              excerpt={getExcerpt(entry.body || "")}
+              tags={entry.data.tags.slice(0, 3)}
+              featured={index < 2 && page === 1}
+            />
+          ))}
+        </div>
+      )}
+
+      {entries.length > 0 && totalPages > 1 && (
+        <nav class="pagination">
+          <div class="pagination__info">
+            Page {page} of {totalPages} ({totalEntries.toLocaleString()} total)
+          </div>
+          <div class="pagination__links">
+            {page > 1 && (
+              <a href={`${baseUrl}?page=${page - 1}${search ? `&search=${encodeURIComponent(search)}` : ""}`} class="pagination__link">
+                ← Previous
+              </a>
+            )}
+
+            {pageNumbers.map((pageNum) => (
+              <a
+                href={`${baseUrl}?page=${pageNum}${search ? `&search=${encodeURIComponent(search)}` : ""}`}
+                class={`pagination__link pagination__number ${pageNum === page ? "pagination__link--current" : ""}`}
+              >
+                {pageNum}
+              </a>
+            ))}
+
+            {page < totalPages && (
+              <a href={`${baseUrl}?page=${page + 1}${search ? `&search=${encodeURIComponent(search)}` : ""}`} class="pagination__link">
+                Next →
+              </a>
+            )}
+          </div>
+        </nav>
+      )}
     </main>
   </div>
 </Base>
@@ -171,6 +234,44 @@ const categoryDescriptions: Record<string, string> = {
     margin: 0;
   }
 
+  .search-form {
+    display: flex;
+    gap: var(--space-2);
+    margin-top: var(--space-6);
+    max-width: 500px;
+  }
+
+  .search-input {
+    flex: 1;
+    padding: var(--space-2) var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: var(--text-base);
+    background: var(--color-bg);
+  }
+
+  .search-button {
+    padding: var(--space-2) var(--space-4);
+    background: var(--category-color, var(--color-primary));
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: var(--text-base);
+  }
+
+  .search-button:hover {
+    opacity: 0.9;
+  }
+
+  .search-clear {
+    padding: var(--space-2) var(--space-3);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+  }
+
   .page__content {
     padding: var(--space-8) var(--space-4);
     max-width: var(--max-width-wide);
@@ -204,5 +305,57 @@ const categoryDescriptions: Record<string, string> = {
     .page__grid {
       grid-template-columns: repeat(4, 1fr);
     }
+  }
+
+  .no-results {
+    text-align: center;
+    color: var(--color-text-secondary);
+    padding: var(--space-12);
+  }
+
+  .pagination {
+    margin-top: var(--space-8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .pagination__info {
+    color: var(--color-text-secondary);
+    font-size: var(--text-sm);
+  }
+
+  .pagination__links {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .pagination__link {
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    color: var(--color-text);
+    background: var(--color-bg);
+    transition: all 0.15s ease;
+  }
+
+  .pagination__link:hover {
+    background: var(--color-bg-secondary);
+    border-color: var(--category-color, var(--color-primary));
+  }
+
+  .pagination__link--current {
+    background: var(--category-color, var(--color-primary));
+    color: white;
+    border-color: var(--category-color, var(--color-primary));
+  }
+
+  .pagination__number {
+    min-width: 40px;
+    text-align: center;
   }
 </style>

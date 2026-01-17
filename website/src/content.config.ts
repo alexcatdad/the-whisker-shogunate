@@ -1,8 +1,9 @@
 import { defineCollection, z } from "astro:content";
-import { glob } from "astro/loaders";
+import { convexLoader } from "./loaders/convex-loader";
 
+// Use Convex for both dev and production - fetches from cloud at build time
 const lore = defineCollection({
-  loader: glob({ pattern: "**/*.md", base: "./src/content/lore" }),
+  loader: convexLoader(),
   schema: z.object({
     id: z.string(),
     title: z.string(),

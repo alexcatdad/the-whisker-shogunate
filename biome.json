@@ -50,7 +50,7 @@
     }
   },
   "files": {
-    "includes": ["**", "!**/node_modules", "!**/dist", "!**/*.lock", "!**/*.json"]
+    "includes": ["**", "!**/node_modules", "!**/dist", "!**/*.lock", "!**/*.json", "!convex/_generated/**"]
   },
   "vcs": {
     "enabled": true,
