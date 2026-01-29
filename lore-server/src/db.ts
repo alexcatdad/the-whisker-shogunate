@@ -58,11 +58,11 @@ export async function connect(): Promise<void> {
 export async function searchLore(
   query: string,
   category?: string,
-  limit = 10
+  limit = 10,
 ): Promise<SearchResult[]> {
   const queryVector = await embed(query);
 
-  const results = await getClient().query(api.lore.searchLore, {
+  const results = await getClient().action(api.lore.searchLore, {
     embedding: queryVector,
     category,
     limit,
@@ -145,10 +145,7 @@ export async function createEntry(input: CreateEntryInput): Promise<LoreEntry> {
   return convexToEntry(entry);
 }
 
-export async function updateEntry(
-  id: string,
-  input: UpdateEntryInput
-): Promise<LoreEntry | null> {
+export async function updateEntry(id: string, input: UpdateEntryInput): Promise<LoreEntry | null> {
   // Find the entry first
   const existing = await getEntry(id);
   if (!existing) {
@@ -191,7 +188,7 @@ export async function updateEntry(
   });
 
   const fieldsUpdated = Object.keys(input).filter(
-    (k) => input[k as keyof UpdateEntryInput] !== undefined
+    (k) => input[k as keyof UpdateEntryInput] !== undefined,
   );
   log.updateEntry(id, existing.title, fieldsUpdated);
 

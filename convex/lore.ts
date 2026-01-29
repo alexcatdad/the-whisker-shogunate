@@ -1,6 +1,7 @@
 import { v } from "convex/values";
-import { query, mutation, internalMutation } from "./_generated/server";
+import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
+import { action, internalMutation, internalQuery, mutation, query } from "./_generated/server";
 
 // ===== QUERIES =====
 
@@ -41,51 +42,56 @@ export const listCategories = query({
   },
 });
 
-export const searchLore = query({
+// Internal query to fetch lore entries by embedding IDs
+export const fetchLoreByEmbeddingIds = internalQuery({
+  args: {
+    ids: v.array(v.id("loreEmbeddings")),
+  },
+  handler: async (ctx, args) => {
+    const results = await Promise.all(
+      args.ids.map(async (id) => {
+        const embedding = await ctx.db.get(id);
+        if (!embedding) return null;
+        const lore = await ctx.db.get(embedding.loreId);
+        return lore;
+      }),
+    );
+    return results.filter((r): r is Doc<"lore"> => r !== null);
+  },
+});
+
+export const searchLore = action({
   args: {
     embedding: v.array(v.float64()),
     category: v.optional(v.string()),
     limit: v.optional(v.number()),
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<{ entry: Doc<"lore">; score: number }[]> => {
     const limit = args.limit ?? 10;
 
-    let results: Array<Doc<"loreEmbeddings"> & { _score: number }>;
-
-    if (args.category) {
-      const cat = args.category;
-      // @ts-expect-error - withVectorIndex types not generated correctly
-      results = await ctx.db
-        .query("loreEmbeddings")
-        .withVectorIndex("by_embedding", {
+    // Use ctx.vectorSearch for vector similarity search (only available in actions)
+    const results = args.category
+      ? await ctx.vectorSearch("loreEmbeddings", "by_embedding", {
           vector: args.embedding,
           limit,
-          filter: (q: { eq: (field: string, value: string) => unknown }) =>
-            q.eq("category", cat),
+          filter: (q) => q.eq("category", args.category!),
         })
-        .collect();
-    } else {
-      // @ts-expect-error - withVectorIndex types not generated correctly
-      results = await ctx.db
-        .query("loreEmbeddings")
-        .withVectorIndex("by_embedding", {
+      : await ctx.vectorSearch("loreEmbeddings", "by_embedding", {
           vector: args.embedding,
           limit,
-        })
-        .collect();
-    }
+        });
 
-    // Fetch full lore entries
-    const entries = await Promise.all(
-      results.map(async (r: Doc<"loreEmbeddings"> & { _score: number }) => {
-        const lore = await ctx.db.get(r.loreId);
-        return { entry: lore, score: r._score };
-      })
-    );
+    // Fetch full lore entries using internal query
+    const ids = results.map((r) => r._id);
+    const entries: Doc<"lore">[] = await ctx.runQuery(internal.lore.fetchLoreByEmbeddingIds, {
+      ids,
+    });
 
-    return entries.filter(
-      (e): e is { entry: Doc<"lore">; score: number } => e.entry !== null
-    );
+    // Combine with scores
+    return entries.map((entry: Doc<"lore">, i: number) => ({
+      entry,
+      score: results[i]?._score ?? 0,
+    }));
   },
 });
 
@@ -198,6 +204,34 @@ export const deleteLore = mutation({
   },
 });
 
+// ===== ADMIN MUTATIONS =====
+
+export const deleteAllEmbeddings = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const embeddings = await ctx.db.query("loreEmbeddings").collect();
+    for (const emb of embeddings) {
+      await ctx.db.delete(emb._id);
+    }
+    return embeddings.length;
+  },
+});
+
+export const storeEmbedding = mutation({
+  args: {
+    loreId: v.id("lore"),
+    embedding: v.array(v.float64()),
+    category: v.string(),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.insert("loreEmbeddings", {
+      loreId: args.loreId,
+      embedding: args.embedding,
+      category: args.category,
+    });
+  },
+});
+
 // ===== INTERNAL MUTATIONS (for bulk import) =====
 
 export const bulkCreateLore = internalMutation({
@@ -213,7 +247,7 @@ export const bulkCreateLore = internalMutation({
         createdAt: v.number(),
         updatedAt: v.number(),
         embedding: v.optional(v.array(v.float64())),
-      })
+      }),
     ),
   },
   handler: async (ctx, args) => {

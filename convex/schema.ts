@@ -23,7 +23,7 @@ export default defineSchema({
     .index("by_lore", ["loreId"])
     .vectorIndex("by_embedding", {
       vectorField: "embedding",
-      dimensions: 384, // nomic-embed-text from Ollama
+      dimensions: 1024, // bge-large-en-v1.5 from Infinity
       filterFields: ["category"],
     }),
 });

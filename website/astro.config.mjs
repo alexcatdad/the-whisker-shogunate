@@ -2,6 +2,7 @@ import { defineConfig } from "astro/config";
 import node from "@astrojs/node";
 
 // https://astro.build/config
+// Last lore sync: 2026-01-29 (added fantasy ingredients)
 export default defineConfig({
   site: "https://alexcatdad.github.io",
   base: "/the-whisker-shogunate/",
