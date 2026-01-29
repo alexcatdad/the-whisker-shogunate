@@ -1,7 +1,3 @@
 {
-  "mcpServers": {
-    "whisker-lore": {
-      "url": "http://localhost:3001/mcp"
-    }
-  }
+  "mcpServers": {}
 }

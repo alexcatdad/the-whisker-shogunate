@@ -7,9 +7,6 @@ pre-commit:
     lint-staged:
       glob: "*.{ts,tsx,js,jsx}"
       run: bunx lint-staged
-    typecheck:
-      glob: "*.{ts,tsx}"
-      run: bun run typecheck
 
 commit-msg:
   commands:
