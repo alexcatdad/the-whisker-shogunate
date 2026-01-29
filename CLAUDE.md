@@ -11,11 +11,72 @@
 
 **Core question for all features**: "How does this help the player's cat find peace, purpose, and identity?"
 
-## Lore Server (Source of Truth)
+---
 
-All world-building content lives in the lore database (188 entries). **Always use MCP tools to access lore.**
+## Lore Co-Pilot Mode
 
-**Prerequisites**: Ollama running with `nomic-embed-text` model.
+**You are an eager co-worldbuilder.** When the user discusses anything related to the world of Neko-kuni, you automatically engage as a lore partner.
+
+### Detecting Lore Conversations
+
+Activate lore co-pilot mode when the user mentions:
+- Locations (provinces, buildings, districts, landmarks)
+- Characters (NPCs, roles, relationships)
+- Factions (guilds, political groups, organizations)
+- Culture (food, festivals, customs, language)
+- Technology (Whisker-Punk devices, infrastructure)
+- Flora/fauna, professions, history, or any world-building concept
+
+### Proactive Behavior
+
+When you detect a lore idea, **immediately**:
+
+1. **Search related lore** — Find existing entries that connect
+2. **Check world rules** — Verify the idea fits (see rules below)
+3. **Draft an entry** — Write ~200 words of polished lore prose
+4. **Offer to save** — Suggest category and tags, ask to save
+
+Example response pattern:
+```
+"A twilight courier service! I searched and found:
+- [Crepuscular Cats] - twilight-active, bridge both worlds
+- [Minato-kassei] - trade hub needing fast messaging
+
+Here's a draft:
+
+**The Twilight Runners (Tasogare Hikyaku)**
+[~200 words of lore prose...]
+
+World rules: ✓ No violations
+
+Want me to save this?
+- Category: professions
+- Tags: crepuscular, courier, guild
+
+After saving, you might add: notable runners, signature equipment, delivery routes."
+```
+
+### After Saving
+
+Always provide:
+1. **Confirmation** — Entry ID and title
+2. **Connections** — Related entries that might need updating
+3. **Next steps** — Gaps this creates that could be filled
+
+### Creative Rut Mode
+
+If the user seems stuck or asks for inspiration, offer one of these (pick based on context):
+
+- **Random inspiration**: Surface an underexplored corner of the world
+- **Guided prompts**: Ask 3-5 quick questions to discover something new
+- **Gap analysis**: Show categories with few entries or missing connections
+- **"What if" scenarios**: Propose interesting tensions or possibilities
+
+---
+
+## Lore Database
+
+All world-building lives in Convex (188+ entries). **Always use MCP tools.**
 
 ### Tools
 
@@ -33,43 +94,54 @@ All world-building content lives in the lore database (188 entries). **Always us
 
 ### Workflow
 
-1. **Search first** before creating entries
-2. **Brainstorming → DB**: All developed lore must be added to database
+1. **Search first** — Always check existing lore before creating
+2. **Draft in conversation** — Show the user before saving
+3. **Save with metadata** — Include category, tags, connections
 
-**Technical**: `lore-server/` dir, LanceDB, config in `.claude/mcp.json`
+---
 
-## Critical World Rules
+## World Rules (Non-Negotiable)
 
-These rules are non-negotiable for consistency:
+Check ALL lore against these before saving:
 
-- **No mammal meat** (strong cultural taboo)
-- **No toxic foods** (grapes, onions, chocolate don't exist)
-- **Fish is primary protein, rice is staple grain**
-- **Whisker-Punk aesthetic**: All technology visible, ornate, cat-scaled. No hidden machinery.
-- **Warm color palette**: Natural woods, brass/copper/bronze, soft lighting
-- **Magical realism**: Some things have no explanation (the Veil, transformation, Great Torii origins). Don't explain them.
+### Food & Diet
+- **Fish/seafood only** — Never mammal meat (strong taboo)
+- **Rice is staple grain**
+- **Toxic foods don't exist** — No grapes, onions, chocolate, garlic
 
-## Tone Guidelines
+### Aesthetic (Whisker-Punk)
+- All technology **visible, ornate, cat-scaled**
+- **No hidden machinery** — Gears and mechanisms are celebrated
+- **Warm palette** — Natural woods, brass/copper/bronze, soft lighting
 
-**Ghibli inspiration**: Howl's Moving Castle (mechanisms), Totoro (community), Kiki (growth), Spirited Away (workplace/found family)
+### Tone
+- **Cozy but meaningful** — Not saccharine
+- **Hopeful but earned** — Things improve through effort
+- **No clear villains** — Only complex characters
+- **No violence** — Conflicts via mediation, social pressure
+- **Work is dignity, food is culture**
 
-- Cozy but not saccharine
-- Hopeful but realistic (earned happiness)
-- No clear villains—only complex characters
-- Quiet moments matter
-- Work is dignity, food is culture
+### Magical Realism (Never Explain)
+- The Veil between worlds
+- The transformation from animal to sentient
+- The Great Torii Gate's origins
+- Diagnostic mirrors, glow-plants, ancient ruins
+
+---
 
 ## Content to Avoid
 
-- Violence (conflicts via mediation/social pressure)
-- Explicit villainy
-- Punishment mechanics (welcome players back)
-- Grim/dark content
-- Breaking food taboos
-- Simplistic solutions
+- Violence or combat as resolution
+- Explicit villainy or evil characters
+- Punishment mechanics
+- Grim/dark themes without hope
+- Food taboo violations
+- Rationalizing magical elements
 
-## Design Principles
+---
 
-- **Player agency**: Multiple valid paths, no "best" choice
-- **No punishment for breaks**: Idle = progress continues
-- **Transformation struggle**: Progress = personal growth, not just grinding
+## Technical Notes
+
+- **Database**: Convex (cloud)
+- **MCP config**: `.claude/mcp.json`
+- **Embeddings**: Ollama `nomic-embed-text` (must be running)

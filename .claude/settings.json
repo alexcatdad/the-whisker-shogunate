@@ -1,0 +1,25 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "prompt": "Scan the user's message for lore-related content (locations, characters, factions, culture, technology, food, flora, professions, history, or any Whisker Shogunate world-building). If detected, remind Claude to activate Lore Co-Pilot Mode: search related lore, check world rules, draft an entry, and offer to save. Be proactive and eager."
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "create_entry",
+        "prompt": "Before creating this lore entry, verify:\n1. search_lore was called first to check for duplicates/related content\n2. Content follows world rules:\n   - No mammal meat (fish/seafood only)\n   - No toxic foods (grapes, onions, chocolate, garlic don't exist)\n   - Whisker-Punk aesthetic (visible, ornate, cat-scaled tech)\n   - Warm palette (natural woods, brass/copper/bronze)\n   - No violence (conflicts via mediation/social pressure)\n   - No clear villains (only complex characters)\n   - Don't explain magical realism elements\n3. Draft was shown to user and approved\n\nIf violations found, suggest corrections before saving."
+      },
+      {
+        "matcher": "update_entry",
+        "prompt": "Before updating this lore entry, verify the changes follow world rules:\n- No mammal meat, no toxic foods\n- Whisker-Punk aesthetic, warm palette\n- No violence, no clear villains\n- Don't explain magical elements\n\nIf violations found, suggest corrections."
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "create_entry",
+        "prompt": "Entry saved! Now provide:\n1. Confirmation with entry ID\n2. Connections - search for 3-5 related entries that might reference or be referenced by this new content\n3. Next steps - suggest 2-3 gaps this creates (characters, locations, items, etc.) that could be filled next"
+      }
+    ]
+  }
+}

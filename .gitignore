@@ -11,9 +11,12 @@ Thumbs.db
 *.swo
 *~
 
-# Claude Code (keep mcp.json for project MCP servers)
+# Claude Code (keep project config, ignore local-only files)
 .claude/*
 !.claude/mcp.json
+!.claude/settings.json
+!.claude/skills/
+!.claude/agents/
 
 # Node
 node_modules/
