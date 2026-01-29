@@ -1,9 +1,0 @@
-{
-  "mcpServers": {
-    "whisker-lore": {
-      "command": "bun",
-      "args": ["src/index.ts"],
-      "cwd": "./lore-server"
-    }
-  }
-}

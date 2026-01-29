@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "whisker-lore": {
+      "type": "stdio",
+      "command": "bash",
+      "args": [
+        "./lore-server/start.sh"
+      ],
+      "env": {}
+    }
+  }
+}
