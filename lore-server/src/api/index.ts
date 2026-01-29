@@ -6,6 +6,7 @@ import { categoriesRoutes } from "./routes/categories";
 import { statsRoutes } from "./routes/stats";
 import { exportRoutes } from "./routes/export";
 import { healthRoutes } from "./routes/health";
+import { mcpRoutes } from "./routes/mcp";
 
 export const app = new Elysia()
   .use(cors())
@@ -22,6 +23,7 @@ export const app = new Elysia()
   .use(loreRoutes)
   .use(categoriesRoutes)
   .use(statsRoutes)
-  .use(exportRoutes);
+  .use(exportRoutes)
+  .use(mcpRoutes);
 
 export type App = typeof app;
