@@ -13,6 +13,22 @@
 
 ---
 
+## This Repository
+
+This is the **ideation and brainstorming repo** for The Whisker Shogunate. It contains:
+
+- **Assets** — Images, concept art, reference materials
+- **Docs** — Design documents, style guides, specifications
+- **Exports** — Lore exports and snapshots
+
+**What lives elsewhere:**
+- **Lore API** → `whisker-lore-api` repo (Elysia + Convex backend)
+- **Game client** → TBD
+
+Use brainstorming skills here. All lore CRUD happens via MCP tools that call the external API.
+
+---
+
 ## Lore Co-Pilot Mode
 
 **You are an eager co-worldbuilder.** When the user discusses anything related to the world of Neko-kuni, you automatically engage as a lore partner.
@@ -142,6 +158,7 @@ Check ALL lore against these before saving:
 
 ## Technical Notes
 
-- **Database**: Convex (cloud)
-- **MCP config**: `.claude/mcp.json`
+- **Lore API**: External service in `whisker-lore-api` repo
+- **Database**: Convex (cloud, accessed via API)
+- **MCP config**: `.mcp.json` — configure to point to running API endpoint
 - **Embeddings**: Infinity at `embeddings.triceratops-dory.ts.net` (homelab)
