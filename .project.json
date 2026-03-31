@@ -1,0 +1,8 @@
+{
+  "$schema": "https://alexcatdad.github.io/schemas/project-meta.schema.json",
+  "what": "World-building and lore repository for a feudal Japan cat isekai idle game.",
+  "why": "Documents lore, characters, and world design with semantic search over the lore database.",
+  "tags": ["game-design", "lore", "world-building", "semantic-search"],
+  "featured": false,
+  "order": 55
+}
